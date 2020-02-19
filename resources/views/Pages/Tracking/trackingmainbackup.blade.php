@@ -66,7 +66,7 @@ var appstatus = 3;
 
 
 
-var pubnub_sub_key = 'sub-c-95101cda-8a8a-11e8-85ee-866938e9174c';
+var pubnub_sub_key = 'sub-c-78b69e00-da95-11e8-911d-e217929ad048';
     var pubnub_ssl = true;
     var pubnub_chnl = 'my_channel';
 
@@ -101,64 +101,64 @@ map.on('locationfound', function(e) {
 
 
 
-     $(document).ready(function () 
-    {
+    //  $(document).ready(function () 
+    // {
 
-        $.ajax({
-                              url:"api/getAllDrivers",
-                              type:"GET",
-                              dataType:'json',
-                              success:function(response){
+    //     $.ajax({
+    //                           url:"api/getAllDrivers",
+    //                           type:"GET",
+    //                           dataType:'json',
+    //                           success:function(response){
                         
-                                     var data = response.data;
+    //                                  var data = response.data;
                                     
 
                                    
-                                        $.each(data, function (ind, val) {
-                                            if (val.latitude) {
+    //                                     $.each(data, function (ind, val) {
+    //                                         if (val.latitude) {
                                             
 
-                                            }
-                                            else
-                                            {
-                                                val.latitude=24.870494;
-                                            }
-                                            if (val.longitude) 
-                                            {
+    //                                         }
+    //                                         else
+    //                                         {
+    //                                             val.latitude=24.870494;
+    //                                         }
+    //                                         if (val.longitude) 
+    //                                         {
 
-                                            }
-                                            else
-                                            {
-                                                val.longitude=46.449969;
+    //                                         }
+    //                                         else
+    //                                         {
+    //                                             val.longitude=46.449969;
 
-                                            }
-                                            var adata = {
-                                                "id": val.driveId,
-                                                "name": val.fullName,
-                                                "lat": val.latitude, 
-                                                "lng": val.longitude,
-                                                "appstatus": val.apptStatus,
-                                                "user": val.userId,
-                                                "status": 3,
-                                            };
-                                            allDriver[val.user] = adata;
-                                          // allDriver.push(adata);
+    //                                         }
+    //                                         var adata = {
+    //                                             "id": val.driveId,
+    //                                             "name": val.fullName,
+    //                                             "lat": val.latitude, 
+    //                                             "lng": val.longitude,
+    //                                             "appstatus": val.apptStatus,
+    //                                             "user": val.userId,
+    //                                             "status": 3,
+    //                                         };
+    //                                         allDriver[val.user] = adata;
+    //                                       // allDriver.push(adata);
 
-                                        show_data(3, 0);
+    //                                     show_data(3, 0);
 
 
-                                        });
-                              },
-                              error:function(){
-                                alert('Error');
-                              }
+    //                                     });
+    //                           },
+    //                           error:function(){
+    //                             alert('Error');
+    //                           }
             
             
-            //     timestamp = response.time;
+    //         //     timestamp = response.time;
             
             
-            });
-        });
+    //         });
+    //     });
 
 
 
@@ -246,13 +246,17 @@ map.on('locationfound', function(e) {
             if (a != 0) {
                
                 if (flg2 == 0) {
-                    allMarkers['D_' + adata.user] = new L.marker(L.latLng(parseFloat(adata.lat), parseFloat(adata.lng)), {
+                    if(allMarkers['D_' + adata.user]==null)
+                    {
+                        allMarkers['D_' + adata.user] = new L.marker(L.latLng(parseFloat(adata.lat), parseFloat(adata.lng)), {
                                                             icon: L.mapbox.marker.icon({
                                                                 'marker-color': "#4caf50"
                                                             }), data: adata
                                                         })
                                                                 .bindPopup('<b>' + adata.name + '</b>')
                                                                 .addTo(map);
+                    }
+                    
                 }
             }
     //    });
@@ -317,13 +321,20 @@ map.on('locationfound', function(e) {
                         var adata = {
                             "id": data.Id,
                            "appstatus": data.appStatus,
-                            "status": data.status,
+                           "status": data.status,
                            "name" : data.name,
-                            "location": data.location,
-                           "user":data.user
+                           "location": data.location,
+                           "user":data.user,
+                           'lat':data.lat,
+                           'lng':data.lng
                         };
-                        updated.push(adata);
 
+
+                        updated.push(adata);
+                        allDriver[adata.user] = adata;
+                                          // allDriver.push(adata);
+
+                        show_data(3, 0);
                      
                         //            });
                          update_data(updated);
@@ -362,9 +373,10 @@ map.on('locationfound', function(e) {
                     var markericong = '';
                     val = allDriver[ind];
     //                console.log(val);
-                    
+    
+    // #d21336 red colour                
                             a = 3;
-                            colorcode = "#d21336";
+                            colorcode = "#4caf50";
                        allDriver[ind].name=data.name;
                        allDriver[ind].user=data.user;
                     var adata = allDriver[ind];
@@ -414,6 +426,53 @@ map.on('locationfound', function(e) {
     //                            delete allMarkers['D_' + adata.user];
                             }
                         }
+
+
+
+
+
+
+
+
+
+
+                        //  var html = '<tr id="D_' + adata.user + '">\
+                        //         <td> \n\
+                        //             <div onclick="get_driver_data(' + adata.user + ');popupmodel();">\n\
+                        //                <p class="p-l-10 col-xs-height col-middle" style="width: 80%">\n\
+                        //                     <span class="text-master" style="padding-right: 30px;">\n\
+                        //                          ' + adata.name + '&nbsp;(ID:' + adata.user + ')<br/>' + adata.mobile + '<br/><b class="sec_D"> sec.</b><font style="float:right;"></font>\n\
+                        //                     </span>\n\
+                        //                 </p>\n\
+                        //                 \n\
+                        //             </div>\n\
+                        //         </td>\n\
+                        //     </tr>';
+                        // if (a != 0) {
+                           
+                        //         $('#D_' + adata.user).remove();
+                        //         $('.drivertableNewOne').append(html);
+                            
+                        // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     } 
                     else 
                     {

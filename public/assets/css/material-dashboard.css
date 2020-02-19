@@ -13605,7 +13605,7 @@ fieldset[disabled] .form-group .form-control {
 .nav-pills.nav-pills-warning .nav-item .nav-link.active,
 .nav-pills.nav-pills-warning .nav-item .nav-link.active:focus,
 .nav-pills.nav-pills-warning .nav-item .nav-link.active:hover {
-  background-color: #ff9800;
+  background-color: #8d2018;
   box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(255, 152, 0, 0.4);
   color: #fff;
 }

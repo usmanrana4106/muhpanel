@@ -21,7 +21,7 @@
 @include('layouts.navbar')
       <div class="content">
          <div class="row">
-            <div class="col-md-9">
+            <div class="col-md-12">
               <div class="card ">
                 <div class="card-header ">
                   <h4 class="card-title">Get Bookings Based on Dates
@@ -40,7 +40,7 @@
                   </ul>
                   <div class="tab-content tab-space">
                     <div class="tab-pane active" id="link1">
-                     <form class="form" method="post" action="{{url('dateBookings')}}">
+                     <form class="form" method="post" action="{{url('R_bookings_dateBookings')}}">
              {{csrf_field()}}
             <div class="card card-login card-hidden">
               
@@ -56,35 +56,177 @@
                   </ul>
               </div>
               @endif
-              <div class="col-md-5">
-                <span class="bmd-form-group">
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">
-                        <i class="material-icons">insert_invitation</i>
-                      </span>
-                    </div>
-                    <input type="date" id="date" name="date" class="form-control" required>
-                  </div>
-                </span>
-              </div>
-              <div class="col-md-5">
+              <div class="col-md-12">
 
-                <span class="bmd-form-group">
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">
-                        <i class="material-icons">clear_all</i>
-                      </span>
-                    </div>
-                      <select id="rideType" name="rideType" class="form-control" required >
-                                  <option value="">...</option>
-                                  <option value="TN">Daily Trips</option>
-                                  <option value="TM">Monthly Trips</option>
-                       </select>
+                    <div class="col-md-5">
+                    <span class="bmd-form-group">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="material-icons">insert_invitation</i>
+                          </span>
+                        </div>
+                        <label class="form-control">Start Date </label>
+                        <input type="date" id="date" name="date" class="form-control" required>
+                      </div>
+                    </span>
                   </div>
-                </span>
+
+                  <div class="col-md-5">
+                    <span class="bmd-form-group">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="material-icons">insert_invitation</i>
+                          </span>
+                        </div>
+                        <label class="form-control">End Date</label><br>
+                        <input type="date" id="endDate" name="endDate" class="form-control" >
+                      </div>
+                    </span>
+                  </div>
+
+                  <div class="col-md-5">
+                    <span class="bmd-form-group">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="material-icons">insert_invitation</i>
+                          </span>
+                        </div>
+                          <select id="rideStatus" name="rideStatus" class="form-control" required >
+                                      <option value="4">End Bookings</option>
+                                      <option value="3">Start Bookings</option>
+                                      <option value="6">On The Way</option>
+                                      <option value="8">Driver Arrived</option>
+                                      <option value="1">New</option>
+                                      <option value="5">Cancel</option>
+                                      <option value="2">not Accepted</option>
+                                      <option value="7">no Driver</option>
+                                      <option value="9">Quit or Crash</option>
+                           </select>
+                      </div>
+                    </span>
+                  </div>
+
+
+
+                  <div class="col-md-5">
+
+                    <span class="bmd-form-group">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="material-icons">clear_all</i>
+                          </span>
+                        </div>
+                          <select id="rideType" name="rideType" class="form-control" required >
+                                      <option value="TN">Daily Trips</option>
+                                      <option value="TM">Monthly Trips</option>
+                           </select>
+                      </div>
+                    </span>
+                  </div>
+
+                  <br><br><br>
+
+                  <legend>(Optional)</legend>
+
+
+
+
+
+                   <div class="col-md-5">
+
+                    <span class="bmd-form-group">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="material-icons">clear_all</i>
+                          </span>
+                        </div>
+                        
+                          <select class="selectpicker" name="carType" data-size="7" data-style="select-with-transition" title="Car Type" required>
+                                        <option value=""></option>
+
+                                      @if(!empty($carTypes))
+                                        @foreach($carTypes as $carType)
+                                        <option value="{{$carType->carId}}"> {{$carType->carName}} </option>
+                                        @endforeach
+                                      @endif
+                                    </select>
+                      </div>
+                    </span>
+                  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                  <div class="col-md-5">
+                    <span class="bmd-form-group">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="material-icons">clear_all</i>
+                          </span>
+                        </div>
+                          
+                          <label class="form-control">Driver ID : </label>
+                          <input type="number" id="driverId" name="driverId" value="0" class="form-control" >
+
+                      </div>
+                    </span>
+                  </div>
+
+
+                  <div class="col-md-5">
+                    <span class="bmd-form-group">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="material-icons">clear_all</i>
+                          </span>
+                        </div>
+                          
+                          <label class="form-control">Booking ID : </label>
+                          <input type="number" id="bookingId" name="bookingId" value="0" class="form-control" >
+
+                      </div>
+                    </span>
+                  </div>
+
+                  <div class="col-md-5">
+                    <span class="bmd-form-group">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="material-icons">clear_all</i>
+                          </span>
+                        </div>
+                          
+                          <label class="form-control">Passenger ID : </label>
+                          <input type="number" id="passengerId" name="passengerId" value="0" class="form-control" >
+
+                      </div>
+                    </span>
+                  </div>
+
+
+
               </div>
+              
               </div>
               <div class="card-footer justify-content-center">
                 <button type="submit" class="btn btn-rose btn-link btn-lg">Submit</button> 

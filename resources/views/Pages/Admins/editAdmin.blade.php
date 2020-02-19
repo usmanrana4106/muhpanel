@@ -71,7 +71,7 @@
                       <label class="col-sm-2 col-form-label">Password</label>
                       <div class="col-sm-5">
                         <div class="form-group">
-                          <input type="password" class="form-control" name="password" id="password"  required>
+                          <input type="password" class="form-control" name="password" id="password" >
                         </div>
                       </div>
                       
@@ -81,8 +81,26 @@
                       <label class="col-sm-2 col-form-label">Confirm Password</label>
                       <div class="col-sm-5">
                         <div class="form-group">
-                          <input type="password" class="form-control" name="confirmpassword" id="confirmpassword"  required>
+                          <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" >
                           <span class="bmd-help">Confirm Password</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <label class="col-sm-2 col-form-label">Admin Role</label>
+                      <div class="col-sm-5">
+                        <div class="form-group">
+                            <select class="selectpicker" name="role_id" data-size="7" data-style="select-with-transition"  required>
+                                  <option value="{{$adminRole->role_id}}">{{$adminRole->role_name}} </option>
+
+                                @if(!empty($SystemRoles))
+                                  @foreach($SystemRoles as $adminRole)
+                                  <option value="{{$adminRole->role_id}}"> {{$adminRole->role_name}} </option>
+                                  @endforeach
+                                @endif
+                          </select>
+                          <span class="bmd-help">Admin Roles</span>
                         </div>
                       </div>
                     </div>

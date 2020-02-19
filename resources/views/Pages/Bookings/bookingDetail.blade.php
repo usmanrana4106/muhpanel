@@ -47,36 +47,125 @@
 	            <div class="col-md-4">
 	              <div class="card card-profile">
 	                <div class="card-avatar">
-	                  <a href="#pablo">
-	                    <img class="img" src="{{  $driverUserInfo->profileImage }}" />
-	                  </a>
+                        <a href="{{$driverUserInfo['profileImage']}}">
+                            <img class="img" src="{{  $driverUserInfo['profileImage'] }}" />
+                        </a>
 	                </div>
-	                <div class="card-body">
-	                  <h6 class="card-category text-gray">User ID{{ $driverUserInfo->userId }}</h6>
-	                  <h6 class="card-category text-gray">{{ $driverUserInfo->userType }}</h6>
-	                  <h4 class="card-title">{{ $driverInfo->fullName }}</h4>
-	                  <p class="card-description">
-	                    {{ "UserID: ".$driverInfo->userId }}<br>
-	                    {{ "DriverID: ".$driverInfo->driveId }}<br>
+	                <div class="card-body" style="color: #0d3625; font-weight:bold;">
+                        <legend>Passenger Information</legend>
+                        @if(!empty($passenger->userId))
+	                  <h6 class="card-category text-gray">User ID: {{ $passenger->userId }}</h6>
+	                  <h6 class="card-category text-gray">User Type: {{ $passenger->userType }}</h6>
+	                  <h4 class="card-title" style="color: #0b75c9; font-weight:bold;">{{ $passengerDetail->fullName }}</h4>
+	                  <p class="card-description" style="color: #0d3625;">
+	                    {{ "UserID: ".$passenger->userId }}<br>
+	                    {{ "PassengerID: ".$passengerDetail->pasengerId }}<br>
 
-	                    {{ $driverUserInfo->gender }}<br>
-	                    {{ $driverInfo->mobileNumber }}<br>
-	                    {{ $driverUserInfo->email }}<br>
-	                    {{ $driverUserInfo->crd }}<br>
+	                    Gender: {{ $passenger->gender }}<br>
+	                    Mobile: {{ $passenger->mobileNumber }}<br>
+	                    Email: {{ $passenger->email }}<br>
+	                    Created_At:{{ $passenger->crd }}<br>
 
 	                  </p>
-	                 
+	                 @endif
 	                </div>
 	              </div>
 	            </div>
 
+            <div class="col-md-4">
+                <div class="card card-profile">
+                    <div class="card-avatar">
+                        <a href="{{$driverUserInfo['profileImage']}}">
+                            <img class="img" src="{{  $driverUserInfo['profileImage'] }}" />
+                        </a>
+                    </div>
+                    <div class="card-body" style="color: #0d3625; font-weight:bold;">
+                        <legend>Driver Information</legend>
+                        @if(!empty($driverUserInfo->userId))
+                            <h6 class="card-category text-gray">User ID{{ $driverUserInfo->userId }}</h6>
+                            <h6 class="card-category text-gray">{{ $driverUserInfo->userType }}</h6>
+                            <h4 class="card-title" style="color: #0b75c9; font-weight:bold;">{{ $driverInfo->fullName }}</h4>
+                            <p class="card-description" style="color: #0d3625">
+                                {{ "UserID: ".$driverInfo->userId }}<br>
+                                {{ "DriverID: ".$driverInfo->driveId }}<br>
 
-              
+                                {{ $driverUserInfo->gender }}<br>
+                                Mobile: {{ $driverInfo->mobileNumber }}<br>
+                                Email: {{ $driverUserInfo->email }}<br>
+                                Vehicle Number: {{$vehicle->vihicleNumber}}<br>
+                                Vehicle Model: {{$vehicle->vehicleModel}}<br>
+                                Vehicle Type : {{$carDetail->carName}}<br>
+                                Vehicle Name: {{$vehicle->company." ".$vehicle->brands}}<br>
+                                Vehicle Reference: {{$vehicle->vehicleReferenceNumber}}<br>
+                                Vehicle Colour: {{$vehicle->colour}}<br>
+                                <br>
+                            </p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card card-profile">
+                    <div class="card-avatar">
+                        <a href="{{$driverUserInfo['profileImage']}}">
+                            <img class="img" src="{{  $driverUserInfo['profileImage'] }}" />
+                        </a>
+                    </div>
+                    <div class="card-body">
+
+                        <legend>Trip Information</legend>
+                        @if(!empty($trips))
+                            <h6 class="card-category text-gray">Pickup Address: <a href="https://www.google.com/maps/search/?api=1&query={{$trips->pickupLatLong}}">{{ $trips->pickupAddress }}</a> </h6>
+                            <h6 class="card-category text-gray">Destination Address: <a href="https://www.google.com/maps/search/?api=1&query={{$trips->destinationLatLong}}">{{ $trips->destinationAddress }}</a> </h6>
+                            <h4 class="card-title" style="color: #0b75c9; font-weight:bold;">RideStatus: {{$trips->rideStatus}},
+                                                                                        @if($trips->rideStatus=='1')
+                                                                                            {{"New Booking"}}}
+                                                                                        @elseif($trips->rideStatus=='2')
+                                                                                            {{"Not Accept"}}
+                                                                                        @elseif($trips->rideStatus=='3')
+                                                                                            {{"Trip Start "}}
+                                                                                        @elseif($trips->rideStatus=='4')
+                                                                                            {{"Trip End"}}
+                                                                                        @elseif($trips->rideStatus=='5')
+                                                                                            {{"Trip Cancel"}}
+                                                                                        @elseif($trips->rideStatus=='6')
+                                                                                            {{"Driver On the Way"}}
+                                                                                        @elseif($trips->rideStatus=='7')
+                                                                                            {{"No driver Found"}}
+                                                                                        @elseif($trips->rideStatus=='8')
+                                                                                            {{"Driver Arrived"}}
+                                                                                        @elseif($trips->rideStatus=='9')
+                                                                                            {{"Quit or Crash"}}
+                                                                                        @endif</h4>
+                            <p class="card-description" style="color: #0d3625; font-weight:bold;">
+                                PassengerId: {{ $trips->passengerId }}<br>
+                                DriverId: {{ $trips->driverId }}<br>
+
+                                Start Date: {{ $trips->rideStartDate }}<br>
+                                End Date: {{ $trips->rideEndDate }}<br>
+                                Start Time: {{ $trips->rideStartTime }}<br>
+                                End Time: {{ $trips->rideEndTime }}<br>
+                                Total Distance: {{ $trips->distance }}<br>
+                                Actual Distance: {{ $trips->actualDistance }}<br>
+                                EST Price: {{ $trips->tripTotal }}<br>
+                                Actual Price: {{ $trips->Actual_TripTotal }}<br>
+                                Actual Time: {{$trips->actualTime}}<br>
+                                Actual Time: {{$trips->actualTime}}<br>
+                                tripReferenceNumber: {{$trips->tripReferenceNumber}}
+                            </p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
                <div class="col-md-8">
-                  <div class="container-fluid " style="width: 700px; height: 400px;">
-                  
+                  <div class="container-fluid " style="width: 1200px; height: 400px;">
+
                   <div id="map" style="width: 100%; height: 100%;" ></div>
-               
+
                   </div>
             </div>
 
@@ -101,21 +190,21 @@
                                 <td>Vehicle Proof</td>
                                 <td>image</td>
                                 <td>image</td>
-                                                                
+
                             </tr>
-                        </thead>  
+                        </thead>
                         <tr>
                                 <td>
-                            
+
                                         <img src="./assets/img/product3.jpg" alt="..." style=" width=20px; height=20px ">
                                     </td>
-                                    
+
                         </tr>
                     </table> -->
 
 
-            
-              
+
+
                   <ul class="nav nav-pills nav-pills-warning" role="tablist">
                     <li class="nav-item">
                       <a class="nav-link active" data-toggle="tab" href="#link1" role="tablist">
@@ -124,18 +213,18 @@
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" data-toggle="tab" href="#link2" role="tablist">
-                        Map View
+                        Money Details
                       </a>
                     </li>
-                   
+
                   </ul>
                   <div class="tab-content tab-space">
                     <div class="tab-pane active" id="link1">
-                    <table  class="table table-responsive">
+                    <table  class="table table-responsive table-striped table-bordered">
                         <thead>
 
                             <tr>
-                            
+
                                 <th >S.No.</th>
     		                        <th >Pass </th>
     		                        <th >Pass Mobile </th>
@@ -148,22 +237,24 @@
     		                        <th >End Time</th>
     		                        <th >Duration</th>
     		                        <th >Ride Status</th>
-                                                
+
                             </tr>
 
-                        </thead>  
-                        
+                        </thead>
+
                                 @if(!empty($trips))
 			                       
 
 			                                 <tr>
 			                                    <td >{{ $trips->bookingId }}</td>
-			                                    <td >{{ $customer->userName }}</td>
-			                                    <td>{{ $customer->mobileNumber }}</td>
+			                                    <td >{{ $passenger->userName }}</td>
+			                                    <td>{{ $passenger->mobileNumber }}</td>
 
-			                                   
+			                                    @if(!empty($driverUserInfo->userId))
 			                                    <td style="background-color: #4caf50ad">{{ $driverInfo->fullName }}</td>
-			                                  
+                                                @else
+                                                <td style="background-color: #4caf50ad">not Yet</td>
+			                                    @endif
 
 			                                    <td style="width: 20%">{{ $trips->pickupAddress }}</td>
 			                                    <td style="width: 20%">{{ $trips->destinationAddress }}</td>
@@ -197,7 +288,68 @@
                     </table>
                     </div>
                     <div class="tab-pane" id="link2">
-                      
+                      <table  class="table table-responsive table-striped table-bordered">
+                        <thead>
+
+                            <tr>
+                            
+                                <th >acc_id</th>
+                                <th >bookingId </th>
+                                <th >userId</th>
+                                <th >driverId </th>
+                                <th >totalAmount</th>
+                                <th >companyProfit</th>
+                                <th >driverPercentage </th>
+                                <th >driverProfit </th>
+                                <th >vatTax</th>
+                                <th >receivedDate</th>
+                                <th >paymentMethod</th>
+                                <th >created_at</th>
+                                                
+                            </tr>
+
+                        </thead>  
+                        
+                                @if(!empty($accounts))
+                            
+
+                                       <tr>
+
+                                          <td >{{ $accounts->acc_id }}</td>
+                                          <td >{{ $accounts->bookingId }}</td>
+                                          <td >{{ $accounts->userId }}</td>
+                                          <td >{{ $accounts->driverId }}</td>
+
+                                          <td >{{ $accounts->totalAmount }}</td>
+                                          <td >{{ $accounts->companyProfit }}</td>
+                                          <td >{{ $accounts->driverPercentage }}</td>
+                                          <td >{{ $accounts->driverProfit }}</td>
+                                          <td >{{ $accounts->vatTax }}</td>
+                                          <td >{{ $accounts->receivedDate }}</td>
+                                          <td >{{ $accounts->paymentMethod }}</td>
+                                          <td >{{ $accounts->created_at }}</td>
+                                         
+                                      </tr>
+
+                                 @else
+                                 <tr class="warning" >
+                                      <td >no Record</td>
+                                      <td >no Record</td>
+                                      <td >no Record</td>
+                                      <td >no Record</td>
+                                      <td >no Record</td>
+                                      <td >no Record</td>
+                                      <td >no Record</td>
+                                      <td >no Record</td>
+                                      <td >no Record</td>
+                                      <td >no Record</td>
+                                      <td >no Record</td>
+                                      <td >no Record</td>
+                                     
+                                 </tr>
+                            @endif
+                     
+                    </table>
                     </div>
                     
                   </div>
@@ -217,7 +369,7 @@
 
 
 
-			</div>
+
 
 
 

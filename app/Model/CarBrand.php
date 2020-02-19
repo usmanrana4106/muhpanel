@@ -9,6 +9,6 @@ class CarBrand extends Model
    protected $table = 'carbrands';
     public $timestamps = false;
  	protected $fillable = [
-						        'brandId', 'brandName', 'companyId'
+						        'brandId', 'brandName','arabicBrandName' ,'companyId'
 						    ];
 }

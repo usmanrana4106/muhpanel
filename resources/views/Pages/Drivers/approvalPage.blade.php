@@ -21,67 +21,263 @@
 @include('layouts.navbar')
       <div class="content">
           <div class="content">
-            <div class="card ">
-              <div class="row">
-                <div class="container-fluid">
-              <div class="col-md-12">
-
-                <table cellspacing="10">
-                  <thead>
-                    <th>Profile Image</th>
-                    <th></th>
-                    <th>Identity Proof</th>
-                    <th></th>
-                    <th>Vehicle Identity Proof</th>
-
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        @if(!empty($driverUser->profileImage))
-                        <div class="logo" >
-                          <img src="{{ url('public/uploads/images/driverImage/'.$driverUser->profileImage) }}" style="width: 150px; height: 150px;" />
-                        </div>
-                        @else
-                        <div class="logo" >
-                          <img src="{{ url('public/assets/img/muhrahlogo.png') }}" style="width: 10%; height: 70%;" />
-                        </div>
-                        @endif
-                      </td>
-
-                      <td style="width: 150px"></td>
-                      <td>
-                        @if(!empty($driverDetails->identityProof))
-                        <div class="logo" >
-                          <img src="{{ url('public/uploads/images/identityProof/'.$driverDetails->identityProof) }}" style="width: 250px; height: 150px;" />
-                        </div>
-                        @else
-                        <div class="logo" >
-                          <img src="{{ url('public/assets/img/muhrahlogo.png') }}" style="width: 10%; height: 70%;" />
-                        </div>
-                        @endif
-                      </td>
-                      <td style="width: 150px"></td>
 
 
-                      <td>
-                         @if(!empty($vehicleDetails->vehicleidentityProof))
-                        <div class="logo" >
-                          <img src="{{ url('public/uploads/images/vehicleProof/'.$vehicleDetails->vehicleidentityProof) }}" style="width: 250px; height: 150px;" />
-                        </div>
-                        @else
-                        <div class="logo" >
-                          <img src="{{ url('public/assets/img/muhrahlogo.png') }}" style="width: 10%; height: 70%;" />
-                        </div>
-                        @endif
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+
+
+
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header card-header-icon card-header-rose">
+                  <div class="card-icon" style="background: #d22619a1;">
+                    <i class="material-icons">perm_identity</i>
                   </div>
+                  <h4 class="card-title">Images Related for the Driver Registration-
+                    <small class="category">Complete His profile</small>
+                  </h4>
+                </div>
+                <div class="card-body">
+                    <!-- <table>
+                        <thead>
+                            <tr>
+                                <td>Identity Proof</td>
+                                <td>Vehicle Proof</td>
+                                <td>image</td>
+                                <td>image</td>
+                                                                
+                            </tr>
+                        </thead>  
+                        <tr>
+                                <td>
+                            
+                                        <img src="./assets/img/product3.jpg" alt="..." style=" width=20px; height=20px ">
+                                    </td>
+                                    
+                        </tr>
+                    </table> -->
+
+
+            
+              
+                  <ul class="nav nav-pills nav-pills-warning" role="tablist">
+                    <li class="nav-item">
+                      <a class="nav-link active" data-toggle="tab" href="#link1" role="tablist" onclick="">
+                        Identity Image
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" data-toggle="tab" href="#link2" role="tablist" onclick="">
+                        Iqama Image
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" data-toggle="tab" href="#link3" role="tablist" onclick="">
+                        Vehicle Proof Image
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" data-toggle="tab" href="#link4" role="tablist" onclick="">
+                        Licence Proof Image
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" data-toggle="tab" href="#link5" role="tablist" onclick="">
+                        Car Image
+                      </a>
+                    </li>
+
+                  </ul>
+                  <div class="tab-content tab-space">
+                    <div class="row">
+                      @if(!empty($uploadImage))
+                        <div class="alert alert-success">
+                                   {{$uploadImage}}
+                        </div>
+                        @endif 
+                    </div>
+                    
+                    <div class="tab-pane active" id="link1">
+
+                       @if(!empty($driverUser->profileImage))
+                        <div class="logo" >
+                          <img src="{{ url('public/uploads/images/driverImage/'.$driverUser->profileImage) }}" style="width: 600px; height: 400px;"/>
+                        </div>
+                        @else
+                        <div class="logo" >
+                          <img src="{{ url('public/assets/img/muhrahlogo.png') }}" style="width: 10%; height: 70%;" />
+                        </div>
+                        @endif
+                          <form action="{{route('Driver.profileImage')}}" method="post" enctype="multipart/form-data">
+                           
+
+
+                            {{csrf_field()}}
+                            <div class="col-sm-4">
+                            <div class="picture-container">
+                              <div class="picture">
+                                <img src="../assets/img/default-avatar.png" class="picture-src" id="wizardPicturePreview" title="" style=" width: 20px; height: 20px;" />
+                                <input type="file" id="profileImage" name="profileImage" required>
+                                <input type="hidden" name="driverId" value="{{$driverDetails->driveId}}">
+                                <input type="hidden" name="userId" value="{{$driverDetails->userId}}">
+                              </div>
+                              <h6 class="description">Choose Picture of ProfileImage</h6>
+                            </div>
+                          </div> 
+                              <button type="submit" class="btn btn-default">Submit</button> 
+                          </form> 
+                    </div>
+                    <div class="tab-pane" id="link2">
+                      
+                      @if(!empty($driverDetails->identityProof))
+                        <div class="logo" >
+                          <img src="{{ url('public/uploads/images/identityProof/'.$driverDetails->identityProof) }}" style="width: 600px; height: 400px;"/>
+                        </div>
+                        @else
+                        <div class="logo" >
+                          <img src="{{ url('public/assets/img/muhrahlogo.png') }}" style="width: 10%; height: 70%;" />
+                        </div>
+                        @endif
+                        <form action="{{route('Driver.identityProof')}}" method="post" enctype="multipart/form-data"> 
+                            {{csrf_field()}}
+                            <div class="col-sm-4">
+                            <div class="picture-container">
+                              <div class="picture">
+                                <img src="../assets/img/default-avatar.png" class="picture-src" id="wizardPicturePreview" title="" style=" width: 20px; height: 20px;" />
+                                <input type="file" id="identityProof" name="identityProof" required>
+                                <input type="hidden" name="driverId" value="{{$driverDetails->driveId}}">
+                                <input type="hidden" name="userId" value="{{$driverDetails->userId}}">
+                              </div>
+                              <h6 class="description">Choose Picture of Iqama</h6>
+                            </div>
+                          </div> 
+                              <button type="submit" class="btn btn-default">Submit</button> 
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="link3">
+                      
+                      @if(!empty($vehicleDetails->vechicleIdentityProof))
+                        <div class="logo" >
+                          <img src="{{ url('public/uploads/images/vehicleProof/'.$vehicleDetails->vechicleIdentityProof) }}"  style="width: 600px; height: 400px;"/>
+                        </div>
+                        @else
+                        <div class="logo" >
+                          <img src="{{ url('public/assets/img/muhrahlogo.png') }}" style="width: 10%; height: 70%;" />
+                        </div>
+                        @endif
+                        <form action="{{route('Driver.vehicleidentityProof')}}" method="post" enctype="multipart/form-data"> 
+                            {{csrf_field()}}
+                            <div class="col-sm-4">
+                            <div class="picture-container">
+                              <div class="picture">
+                                <img src="../assets/img/default-avatar.png" class="picture-src" id="wizardPicturePreview" title="" style=" width: 20px; height: 20px;" />
+                                <input type="file" id="vechicleIdentityProof" name="vechicleIdentityProof" required>
+                                <input type="hidden" name="driverId" value="{{$driverDetails->driveId}}">
+                                <input type="hidden" name="userId" value="{{$driverDetails->userId}}">
+                              </div>
+                              <h6 class="description">Choose Picture of vehicle Identity Proof</h6>
+                            </div>
+                          </div> 
+                              <button type="submit" class="btn btn-default">Submit</button> 
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="link4">
+                      
+                      @if($driverDetails->licenseProof != 'undefined')
+                        <div class="logo" >
+                          <img src="{{ url('public/uploads/images/licenseProof/'.$driverDetails->licenseProof) }}" style="width: 600px; height: 400px;" />
+                        </div>
+                        @else
+                        <div class="logo" >
+                          <img src="{{ url('public/assets/img/muhrahlogo.png') }}" style="width: 10%; height: 70%;" />
+                        </div>
+                        @endif
+                        <form action="{{route('Driver.licenseProof')}}" method="post" enctype="multipart/form-data"> 
+                            {{csrf_field()}}
+                            <div class="col-sm-4">
+                            <div class="picture-container">
+                              <div class="picture">
+                                <img src="../assets/img/default-avatar.png" class="picture-src" id="wizardPicturePreview" title="" style=" width: 20px; height: 20px;" />
+                                <input type="file" id="licenseProof" name="licenseProof" required>
+                                <input type="hidden" name="driverId" value="{{$driverDetails->driveId}}">
+                                <input type="hidden" name="userId" value="{{$driverDetails->userId}}">
+                              </div>
+                              <h6 class="description">Choose Picture of license Proof</h6>
+                            </div>
+                          </div> 
+                              <button type="submit" class="btn btn-default">Submit</button> 
+                        </form>
+                    </div>
+
+
+                    <div class="tab-pane" id="link5">
+                      
+                      @if(!empty($vehicleDetails->driverCarImage))
+                        <div class="logo" >
+                          <img src="{{ url('public/uploads/images/driverCarImage/'.$vehicleDetails->driverCarImage) }}"  style="width: 600px; height: 400px;"/>
+                        </div>
+                        @else
+                        <div class="logo" >
+                          <img src="{{ url('public/assets/img/muhrahlogo.png') }}" style="width: 10%; height: 70%;" />
+                        </div>
+                        @endif
+
+                        <form action="{{route('Driver.driverCarImage')}}" method="post" enctype="multipart/form-data"> 
+                            {{csrf_field()}}
+                            <div class="col-sm-4">
+                            <div class="picture-container">
+                              <div class="picture">
+                                <img src="../assets/img/default-avatar.png" class="picture-src" id="wizardPicturePreview" title="" style=" width: 20px; height: 20px;" />
+                                <input type="file" id="driverCarImage" name="driverCarImage" required>
+                                <input type="hidden" name="driverId" value="{{$driverDetails->driveId}}">
+                                <input type="hidden" name="userId" value="{{$driverDetails->userId}}">
+                              </div>
+                              <h6 class="description">Choose Picture of Driver Car Image</h6>
+                            </div>
+                          </div> 
+                              <button type="submit" class="btn btn-default">Submit</button> 
+                        </form>
+                    </div>
+
+
+
+
+
+
+                    
+                  </div>
+                
+
+
+                </div>
               </div>
-          </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
 
           <div class="card">
             <div class="row">
@@ -172,7 +368,8 @@
                                 </div>
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">day (required)</label>
-                                  <input type="number" class="form-control"  name="day" required value="{{$dateOfBirth[2]}}">
+                                  <input type="number" class="form-control"  name="day" required value="<?php if(!empty($dateOfBirth[2]))
+                                  echo $dateOfBirth[2];?>">
                                 </div>
                               </div>
                             </div>
@@ -186,7 +383,8 @@
                                 </div>
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">month (required)</label>
-                                  <input type="number" class="form-control"  name="month" required value="{{$dateOfBirth[1]}}">
+                                  <input type="number" class="form-control"  name="month" required value="<?php if(!empty($dateOfBirth[1]))
+                                  echo $dateOfBirth[1];?>">
                                 </div>
                               </div>
                             </div>
@@ -200,7 +398,8 @@
                                 </div>
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">year (required)</label>
-                                  <input type="number" class="form-control"  name="year" required value="{{$dateOfBirth[0]}}">
+                                  <input type="number" class="form-control"  name="year" required value="<?php if(!empty($dateOfBirth[0]))
+                                  echo $dateOfBirth[0];?>">
                                 </div>
                               </div>
                             </div>
@@ -208,6 +407,21 @@
                             </div>
 
 
+                            <div class="form-group">
+                                  <label for="exampleInput1" class="bmd-label-floating">Nationality :  </label>
+                                <br>
+                                <select class="selectpicker" name="nationality" data-size="7" data-style="select-with-transition"  required>
+                                        <option value="{{$driverDetails->nationality}}">{{$driverDetails->nationality}}</option>
+
+                                      @if(!empty($nationalities))
+                                        @foreach($nationalities as $nationality)
+                                        <option value="{{$nationality->nat_name}}"> {{$nationality->nat_name}} </option>
+                                        @endforeach
+                                      @endif
+                                </select>
+                            </div>
+                                <br>
+                            
 
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">capital Identity Number (required)</label>
@@ -219,6 +433,10 @@
                                     <input type="text" class="form-control"  name="accountNo" id="accountNo" value="{{$driverDetails->accountNo}}" >
                               </div>
 
+                              <div class="form-group">
+                                    <label for="exampleInput1" class="bmd-label-floating">Driver Reference Number</label>
+                                    <input type="text" class="form-control"  name="driverReferenceNumber" id="driverReferenceNumber" value="{{$driverDetails->driverReferenceNumber}}" readonly >
+                              </div>
                               <!-- <div class="col-sm-4">
                                 <div class="picture-container">
                                   <div class="picture">
@@ -303,19 +521,23 @@
 
                            <div class="col-md-12">
                             <div class="form-group">
-                              @if(!empty($vehicleDetails->company))
-                              <label>Company</label>
-                              <input type="text" class="form-control" id="company" name="company" value="{{$vehicleDetails->company}}" required>
-                              @else
+                              
+                              
                               <label>Company</label>
                                  <select class="form-control"  id="company" name="company" title="Single Company of Car" required>
+
+                                  @if(!empty($vehicleDetails->company))
+                                    <option value="{{$vehicleDetails->company}}" selected> {{$vehicleDetails->company}} </option>
+                                  @endif
+
+
                                 @if(!empty($companies))
                                   @foreach($companies as $company)
                                   <option value="{{$company->companyName}}"> {{$company->companyName}} </option>
                                   @endforeach
                                 @endif
                               </select>
-                              @endif
+                              
                              
                             </div>
                           </div>
@@ -324,17 +546,15 @@
 
                           <div class="col-md-12">
                            <div class="form-group">
-
-                            @if(!empty($vehicleDetails->brands))
-                              <input type="text" class="form-control" id="brands" name="brands" value="{{$vehicleDetails->brands}}" required>
-                              @else
+                           
                               <label>Brands</label>
                               
-                              <input list="brand" name="brands" id="brands"  class="form-control" required>
+                              <input list="brand" name="brands" id="brands" value="@if(!empty($vehicleDetails->brands)){{$vehicleDetails->brands}}@endif" class="form-control" required>
                                 <datalist id="brand">
+                                   
                                      <option value=""></option>
                                 </datalist>
-                                @endif
+                                
                              </div>
                           </div>
 
@@ -345,18 +565,19 @@
 
                           <div class="col-md-12">
                             <div class="form-group">
-                             @if(!empty($vehicleDetails->plateType))
-                              <label  for="exampleInput1" class="bmd-label-floating">plate Type</label>
-                              <input type="text" class="form-control" id="plateType" name="plateType" value="{{$vehicleDetails->plateType}}" required>
-                              @else
+                             
+                              
                               <label>PlateType</label>
                               <select id="plateType" name="plateType" class="form-control" title="plate Type" required>
+                                     @if(!empty($vehicleDetails->plateType))
+                                      <option value="{{$vehicleDetails->plateType}}">{{$vehicleDetails->plateType}}</option>
+                                     @endif
                                     <option value=""></option>
                                     <option value="1">Private car plate</option>
                                     <option value="2">Taxi car plate</option>
 
                             </select>
-                            @endif
+                           
                             </div>
                           </div>
 
@@ -378,6 +599,14 @@
                             </div>
                           </div>
                         </div>
+
+
+                        <div class="form-group">
+                                    <label for="exampleInput1" class="bmd-label-floating">Driver Reference Number</label>
+                                    <input type="text" class="form-control"  name="vehicleReferenceNumber" id="vehicleReferenceNumber" value="{{$vehicleDetails->vehicleReferenceNumber}}" readonly >
+                              </div>
+
+
 
 
                         <label class="col-sm-2 col-form-label label-checkbox">Proofs Status</label>
@@ -415,18 +644,23 @@
                         </div>
 
 
-                            <div class="col-sm-10 checkbox-radios">
-                                  
-                                  <div class="form-check form-check-inline">
-                                    <label class="form-check-label">
-                                      <input class="form-check-input" type="checkbox" name="hitMot"> Hit MOT
-                                      <span class="form-check-sign">
-                                        <span class="check"></span>
-                                      </span>
-                                    </label>
-                                  </div>
-                                 
-                            </div>
+                      <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                          <input class="form-check-input" type="checkbox" checked name="motDriver"> Hit MOT For Driver
+                          <span class="form-check-sign">
+                            <span class="check"></span>
+                          </span>
+                        </label>
+                      </div>
+
+                      <div class="form-check form-check-inline">
+                        <label class="form-check-label">
+                          <input class="form-check-input" type="checkbox" checked name="motVehicle"> Hit MOT For Vehicle
+                          <span class="form-check-sign">
+                            <span class="check"></span>
+                          </span>
+                        </label>
+                      </div>
 
                     </div>
                     <div class="card-footer ">

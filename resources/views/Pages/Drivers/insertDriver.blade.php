@@ -85,6 +85,7 @@
                                 {{$status}}
                           </div>
                         @endif
+                        
                         <div class="row justify-content-center">
                           <div class="col-sm-4">
                             <div class="picture-container">
@@ -191,6 +192,38 @@
                                 </div>
                               </div>
                             </div>
+
+                             <div class="col-sm-12">
+                              <div class="input-group form-control-lg">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text">
+                                    <i class="material-icons"></i>
+                                  </span>
+                                </div>
+                                <div class="form-group">
+                                  
+                                   <select class="selectpicker" name="nationality" data-size="7" data-style="select-with-transition" title="nationality" required>
+                                        <option value=""></option>
+
+                                      @if(!empty($nationalities))
+                                        @foreach($nationalities as $nationality)
+                                        <option value="{{$nationality->nat_name}}"> {{$nationality->nat_name}} </option>
+                                        @endforeach
+                                      @endif
+                                    </select>
+
+                                </div>
+                              </div>
+                            </div>
+
+
+
+
+
+
+
+
+                            
                           </div>
 
                          
@@ -212,8 +245,8 @@
                           </div>
                           <div class="col-sm-4">
                             <div class="form-group">
-                              <label>Company</label>
-                              <select class="selectpicker" name="company" id="company"  data-size="7" data-style="select-with-transition" title="Single Select" required>
+                              
+                              <select class="selectpicker" name="company" id="company"  data-size="7" data-style="select-with-transition" title="Select Company" required>
                                 @if(!empty($companies))
                                   @foreach($companies as $company)
                                   <option value="{{$company->companyName}}"> {{$company->companyName}} </option>
@@ -265,6 +298,12 @@
                               <input type="text" class="form-control" id="plateNumber" name="plateNumber" required>
                             </div>
                           </div>
+                          <div class="col-sm-4">
+                            <div class="form-group">
+                              <label>Colour</label>
+                              <input type="text" class="form-control" id="colour" name="colour" required>
+                            </div>
+                          </div>
                          
                           <div class="col-sm-4">
                             <div class="form-group">
@@ -277,10 +316,10 @@
                             </select>
                             </div>
                           </div>
-                          <div class="col-sm-5">
-                            <div class="form-group select-wizard">
-                              <label>vehicle Type</label>
-                              <select class="selectpicker" name="vihicleType" data-size="7" data-style="select-with-transition" title="Single Select" required>
+                          <div class="col-sm-4">
+                            <div class="form-group">
+                              
+                              <select class="selectpicker" name="vihicleType" data-size="7" data-style="select-with-transition" title="vehicle Type" required>
                                 @if(!empty($carTypes))
                                   @foreach($carTypes as $car)
                                   <option value="{{$car->carId}}"> {{$car->carName}} </option>
@@ -310,7 +349,30 @@
                                   </span>
                                 </label>
                               </div>
-                             
+                              
+                              <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                  <input class="form-check-input" type="checkbox" checked name="motDriver"> Hit MOT For Driver
+                                  <span class="form-check-sign">
+                                    <span class="check"></span>
+                                  </span>
+                                </label>
+                              </div>
+
+                              <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                  <input class="form-check-input" type="checkbox" checked name="motVehicle"> Hit MOT For Vehicle
+                                  <span class="form-check-sign">
+                                    <span class="check"></span>
+                                  </span>
+                                </label>
+                              </div>
+
+
+
+
+
+
                             </div>
                           </div>
                         </div>

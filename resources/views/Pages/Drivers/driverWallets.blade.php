@@ -41,24 +41,24 @@
                     <!--        Here you can write extra buttons/actions for the toolbar              -->
                   </div>
                   <div class="material-datatables">
-                    <table id="datatables" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
+                    <table id="datatables" class="table table-responsive table-striped table-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
                       <thead>
                         <tr>
                           
                         
-		                        <th>D ID</th>                        
-		                        <th>D Name</th>
-		                        <th>Total Earn</th>
-		                        <th>total pay</th>
-		                        <th>total CP</th>
-		                        <th>total Vat</th>
-		                        <th>Curr Cash</th>
-		                        <th>Curr Earn</th>
-		                        <th>curr CP</th>
-                            <th>Curr Vat</th>
-                            <th>Creditor</th>
-                            <th>Pay Left</th>
-		                        <th>Action</th>
+		                        <th>{{trans('drivers.D-ID')}}</th>
+		                        <th>{{trans('drivers.Name')}}</th>
+		                        <th>{{trans('drivers.Total-Earn')}}</th>
+		                        <th>{{trans('drivers.total-pay')}}</th>
+		                        <th>{{trans('drivers.total-CP')}}</th>
+		                        <th>{{trans('drivers.total-Vat')}}</th>
+		                        <th>{{trans('drivers.Curr-Cash')}}</th>
+		                        <th>{{trans('drivers.Curr-Earn')}}</th>
+		                        <th>{{trans('drivers.curr-CP')}}</th>
+                                <th>{{trans('drivers.Curr-Vat')}}</th>
+                                <th>{{trans('drivers.Creditor')}}</th>
+                                <th>{{trans('drivers.Pay-Left')}}</th>
+		                        <th>{{trans('drivers.Action')}}</th>
                         
                     
                           
@@ -87,10 +87,10 @@
                                
                                     
                                     <td style="width: 5%">
-                                        <a href="{{ url('/getPayments',$Wallet->driverId) }}">
+                                        <a href="{{ url('/R_drivers_getPayments',$Wallet->driverId) }}">
                                           <button  type="button" class="btn btn-danger ">Get Payment</button>
                                         </a>
-                                         <a href="{{ url('/getAllPaymentRecords',$Wallet->driverId) }}">
+                                         <a href="{{ url('/R_drivers_getAllPaymentRecords',$Wallet->driverId) }}">
                                           <button  type="button" class="btn btn-success ">Receipts</button>
                                         </a>
 

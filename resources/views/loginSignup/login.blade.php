@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" href="{{ url('public/assets/img/muhrahlogo.png') }}">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <title>
-    Material Dashboard PRO by Creative Tim
+    Muhrah Dashboard
   </title>
   <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
   <!--     Fonts and icons     -->
@@ -45,7 +45,7 @@
           <form class="form" method="post" action="{{url('login')}}">
           	 {{csrf_field()}}
             <div class="card card-login card-hidden">
-              <div class="card-header card-header-rose text-center">
+              <div class="card-header card-header-rose text-center" style="background: rgba(210,38,25,0.93);">
                 <h4 class="card-title">Login</h4>
                 <div class="photo" >
 		            <img src="{{ url('public/assets/img/muhrahlogo.png') }}" style="width: 50%; height: 50%;" />
@@ -63,6 +63,15 @@
 			            </ul>
 			        </div>
 			        @endif
+
+              @if(!empty($Password))
+              <div class="alert alert-danger">
+                      <li>
+                         hello
+                      </li>
+              </div>
+              @endif
+
                 <span class="bmd-form-group">
                   <div class="input-group">
                     <div class="input-group-prepend">

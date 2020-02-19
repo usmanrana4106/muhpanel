@@ -8,7 +8,7 @@
                 <i class="material-icons design_bullet-list-67 visible-on-sidebar-mini">view_list</i>
               </button>
             </div>
-            <a class="navbar-brand" href="#pablo">Dashboard</a>
+            <a class="navbar-brand" href="#pablo">Dashboard  (Saudi Arabia )</a>
           </div>
           <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation" data-target="#navigation-example">
             <span class="sr-only">Toggle navigation</span>
@@ -36,22 +36,35 @@
                   </p>
                 </a>
               </li>
-              <!-- <li class="nav-item dropdown">
+
+              <li class="dropdown language-switch">
+                <a class="" data-toggle="dropdown">
+                  @if(\Session::get('locale')=='en')
+                    <img src="{{ url('public/assets/images/flags/gb.png') }}" class="position-left" alt="">
+                    English
+                  @elseif(\Session::get('locale')=='ar')
+                    <img src="{{ url('public/assets/images/flags/de.png') }}" class="position-left" alt="">
+                    Arabic
+                  @endif
+                  <span class="caret"></span>
+                </a>
+
+
+              </li>
+              <li class="nav-item dropdown">
                 <a class="nav-link" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="material-icons">notifications</i>
-                  <span class="notification">5</span>
+                  <i class="material-icons">language</i>
                   <p class="d-lg-none d-md-block">
                     Some Actions
                   </p>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                  <a class="dropdown-item" href="#">Mike John responded to your email</a>
-                  <a class="dropdown-item" href="#">You have 5 new tasks</a>
-                  <a class="dropdown-item" href="#">You're now friend with Andrew</a>
-                  <a class="dropdown-item" href="#">Another Notification</a>
-                  <a class="dropdown-item" href="#">Another One</a>
+
+                   <a class="english" href="{{ url('locale/en') }}"><img src="{{ url('public/assets/images/flags/gb.png') }}" alt=""> English</a>
+                   <a class="deutsch" href="{{ url('locale/ar') }}"><img src="{{ url('public/assets/images/flags/de.png') }}" alt=""> arabic</a>
+
                 </div>
-              </li> -->
+              </li>
             
               <li class="nav-item">
                 <a class="nav-link" href="{{route('Admin.logout')}}">

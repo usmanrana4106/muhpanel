@@ -19,7 +19,11 @@ use App\Model\EntryItem;
 use App\Model\Group;
 use App\Model\Ledger;
 
-//*****Created By Usman Abbas*******//
+
+
+use App\Model\PassengerWallet;
+
+//***** Created By Usman Abbas *******//
 
 class SignUpController extends Controller
 {
@@ -52,7 +56,6 @@ class SignUpController extends Controller
     {
     	$validation=Validator::make($request->all(), [
 										                'fullName' => 'required',
-										                'email' => 'required',
 										                'mobileNumber'=>'required',
 										                'imeiNumber' => 'required',
 										                'deviceToken'=>'required',
@@ -66,51 +69,110 @@ class SignUpController extends Controller
             $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
             return  response()->json(array('array'=>$array), 200);
         }
+        $user='';
+        if(!empty($request->email))
         $user=Users::where('email',$request->email)->first();
         if (!empty($user)) 
         {
-        	$ErrorDetail=['ErrorDetails'=>"Email is Already Registered",'ErrorMessage'=>""];
+        	$ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>"Email is Already Registered"];
 		    $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
 		    return  response()->json(array('array'=>$array), 200);
         }
 
-        $input=$request->all();
-        $authToken=$this->quickRandom();
-        // $input['password']=Hash::make($request->password);
-        $input['isLoggedIn']=1;
-        $input['logTime']=date('Y-m-d h:i:s');
-        $input['userType']='passenger';
-        $input['authToken']=$authToken;
-        $input['userName']=$request->fullName;
-        $user=Users::create($input);
-        $passengerDetail=['userId'=>$user->id,'fullName'=>$request->fullName,'mobileNumber'=>$request->mobileNumber];
+        try
+        {
+        	$true='true';
+		        $input=$request->all();
+		        $authToken=$this->quickRandom();
+		        if(!empty($request->password))
+	            {
+	                $input['password']=Hash::make($request->password);
+	            }
+		        
+		        $input['isLoggedIn']=1;
+		        $input['logTime']=date('Y-m-d h:i:s');
+		        $input['userType']='passenger';
+		        $input['authToken']=$authToken;
+		        $input['userName']=$request->fullName;
+		        $input['ledgerStatus']=0;
+		        $input['walletStatus']=0;
 
-        $selectgroup=Group::where('name','Passenger')->first();
-		$passengerGroupId=$selectgroup->id;
-		//Creating Passenger Ledger 
-       
-        $passengerDetail['ledgerStatus']=1;
-
-        $passDetail=PassengerDetails::create($passengerDetail);
-
-         $insertledger=[
-            				'group_id'=>$passengerGroupId,
-            				'name'=>$request->fullName."/".$passDetail->id,
-            				'code'=>$passDetail->id,
-            				'op_balance'=>'0.00',
-            				'op_balance_dc'=>'D',
-            				'type'=>0,
-            				'reconciliation'=>1,
-            				'notes'=>''
-        				];
-        Ledger::create($insertledger);
+		        $user=Users::create($input);
 
 
-        $user->passengerDetail=$passDetail;
+		        $passengerDetail=['userId'=>$user->id,'fullName'=>$request->fullName,'mobileNumber'=>$user->mobileNumber];
 
-        $ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>""];
-	    $array=array('UserDetail'=>$user,'ErrorDetail'=>$ErrorDetail,'Result'=>1);
-	    return  response()->json(array('array'=>$array), 200);
+		        $selectgroup=Group::where('name','Passenger')->first();
+				$passengerGroupId=$selectgroup->id;
+				//Creating Passenger Ledger 
+		       
+		        $passengerDetail['ledgerStatus']=1;
+
+		        $passDetail=PassengerDetails::create($passengerDetail);
+
+		        try{
+			        if($user->ledgerStatus=='0')
+		    		{
+		    			$selectgroup=Group::where('name','Passenger')->first();
+	        			$passengerGroupId=$selectgroup->id;
+		    			//Creating Passenger Ledger 
+			            $insertledger=[
+				            				'group_id'=>$passengerGroupId,
+				            				'name'=>$passengerDetail['fullName']."/".$passengerDetail['userId'],
+				            				'code'=>$passengerDetail['userId'],
+				            				'op_balance'=>'0.00',
+				            				'op_balance_dc'=>'D',
+				            				'type'=>0,
+				            				'reconciliation'=>1,
+				            				'notes'=>''
+			            				];
+			           $ledger= Ledger::create($insertledger);
+			            $Input['ledgerStatus']=1;
+		    		}
+		    		if ($user->walletStatus=='0')
+		    		{
+		    			 $wallet= PassengerWallet::create([
+				                                              'userId'=>$user->id,
+				                                              'fullName'=>$passengerDetail['fullName'],
+				                                              'totalPay' => 0.0,
+				                                              'totalPay' => 0.0,
+				                                              'credit' => 0.0,
+				                                              'due' => 0.0
+			                                     		]);
+		    			  $Input['walletStatus']=1;
+		    		}
+	    		    Users::where('userId',$user->id)->update($Input);
+	    		}
+				catch(QueryException $ex)
+				{
+					if (!empty($ledger)) 
+					{
+						Ledger::where('code',$passengerDetail->userId)->delete();
+					}
+					Users::where('userId',$user->id)->delete();
+					PassengerDetails::where('userId',$user->id)->delete();
+		        	$ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>$ex->getMessage()];
+				    $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
+				    return  response()->json(array('array'=>$array), 200);
+				}
+
+		        $user->passengerDetail=$passDetail;
+		        $ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>""];
+			    $array=array('UserDetail'=>$user,'ErrorDetail'=>$ErrorDetail,'Result'=>1);
+			    return  response()->json(array('array'=>$array), 200);
+	    }
+        catch(QueryException $ex)
+        {
+        	if (!empty($user)) 
+        	{
+        		Users::where('userId',$user->id)->delete();
+        	    PassengerDetails::where('userId',$user->id)->delete();
+        	}
+        	
+        	$ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>$ex->getMessage()];
+		    $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
+		    return  response()->json(array('array'=>$array), 200);
+        }
     }
 
     //here we Register Driver with his Vehicle
@@ -136,19 +198,21 @@ class SignUpController extends Controller
         }
 
 
-        $user = Users::where('email','=', $request->email)->first();
+        $user = Users::where('mobileNumber','=', $request->mobileNumber)->first();
+
+	    try{
 	      if(empty($user))
 	      {
-	      	try{
+	      	
 			      	$input=$request->all();
 		            $date=explode("-", $request->dateOfBirth);
 			        $input['dateOfBirth']=$date[2]."-".$date[1]."-".$date[0];
 			      	$str=$request->captainIdentityNumber;
 			      	// if ($str[0]=='1') 
 			      	// {
-				        $driver_data = array("apiKey" => "8EF7AA53-3860-4242-955F-7AC218FDE3C1", "captainIdentityNumber" => $request->captainIdentityNumber , "dateOfBirth" => $request->dateOfBirth,"emailAddress" =>$request->email,"mobileNumber"=>$request->mobileNumber); 
-			            $driver_data_string = json_encode($driver_data); 
-			            $url = "https://wasl.elm.sa/WaslPortalWeb/rest/DriverRegistration/send"; 
+				        $driver_data = array("apiKey" => "8EF7AA53-3860-4242-955F-7AC218FDE3C1", "captainIdentityNumber" => $request->captainIdentityNumber , "dateOfBirth" => $request->dateOfBirth,"emailAddress" =>$request->email,"mobileNumber"=>$request->mobileNumber);
+			            $driver_data_string = json_encode($driver_data);
+			            $url = "https://wasl.elm.sa/WaslPortalWeb/rest/DriverRegistration/send";
 			            $driver_api_response = MOT::call_api($driver_data_string,$url);
 			            $notapprovedMOT='0';
 			            $data_decode = json_decode($driver_api_response,true);
@@ -162,42 +226,59 @@ class SignUpController extends Controller
 
 			            if($data_decode['resultCode']!='100')
 			            {
-			                if ($data_decode['resultMessage']=="General Server Error") 
-			                {
-			                    $ReferenceNumber = 99999;
-			                    $notapprovedMOT='1';
-			                    $input['licenceNumberStatus']=0;
-	        					$input['identityProofStatus']=0;
-			                }
-			                else
-			                {
-			                    $errors = $data_decode['resultMessage'];
-			                    $ErrorDetail=['ErrorDetails'=>"Error in MOT",'ErrorMessage'=> preg_replace("/[\\n\\r]+/", " ", $errors)];
-					            $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
-					            return  response()->json(array('array'=>$array), 200);
-			                }           
+                            $ReferenceNumber = 99999;
+                            $notapprovedMOT='1';
+                            $input['licenceNumberStatus']=0;
+                            $input['identityProofStatus']=0;
+//			                if ($data_decode['resultMessage']=="General Server Error")
+//			                {
+//			                    $ReferenceNumber = 99999;
+//			                    $notapprovedMOT='1';
+//			                    $input['licenceNumberStatus']=0;
+//	        					$input['identityProofStatus']=0;
+//			                }
+//			                else
+//			                {
+//			                    $errors = $data_decode['resultMessage'];
+//			                    if (empty($errors)) {
+//		                        	$errors="MOt is Not sending Response";
+//		                        }
+//			                    $ErrorDetail=['ErrorDetails'=>"Error in MOT",'ErrorMessage'=> preg_replace("/[\\n\\r]+/", " ", $errors)];
+//					            $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
+//					            return  response()->json(array('array'=>$array), 200);
+//			                }
 			            }
 				    // }
 				    // else
 				    // {
-				    // 	$ReferenceNumber = 99999;
-				    // 	$notapprovedMOT='1';
-				    // 	$input['licenceNumberStatus']=0;
-	       //  			$input['identityProofStatus']=0;
+
 				    // }
+
 	   
 	       			$authToken=$this->quickRandom();
 		            $input['authToken']=$authToken;
 		            $input['notapprovedMOT']=$notapprovedMOT;
 		            $input['status']=1;
-		            // $input['password']=Hash::make($request->password);
+		            if(!empty($request->password))
+		            {
+		                $input['password']=Hash::make($request->password);
+		            }
+		            //$input['gender']=$request->gender;
 		            $input['userType']='driver';
 	        		$input['logTime']=date('Y-m-d h:i:s');
 	        		$input['isLoggedIn']=1;
+	        		$input['userName']=$request->fullName;
 
 		            $user=Users::create($input);
 		           	
-		           	$file=$request->file('profileImage');
+		           	
+
+		            $input['userId']=$user->id;
+		            $input['driverReferenceNumber']=$ReferenceNumber;
+		            
+		            $driverDetails=Drivers::create($input);
+
+		            $file=$request->file('profileImage');
 			        if($file)
 			        {
 			        	$extension=$file->getClientOriginalExtension();
@@ -207,48 +288,62 @@ class SignUpController extends Controller
 			            $user->profileImage=$this->url."/public/uploads/images/driverImage/".$filename;
 			        }
 
-		            $input['userId']=$user->id;
-		            $input['driverReferenceNumber']=$ReferenceNumber;
-		            
-
-		            $driverDetails=Drivers::create($input);
-
 		           	$file=$request->file('identityProof');
 		           	if($file)
 			        {
 			        	$extension=$file->getClientOriginalExtension();
 			            $filename =$user->id.".".$extension;
 			            $file->move('public/uploads/images/identityProof/',$filename);
-			            Drivers::where('userId',$user->id)->update(['identityProof'=> $filename]);
 			            $user->identityProof=$this->url."/public/uploads/images/identityProof/".$filename;
+			            $Images['identityProof']=$filename;
+
+			            $file=$request->file('licenseProof');
+			           	if($file)
+				        {
+				        	$extension=$file->getClientOriginalExtension();
+				            $filename =$user->id.".".$extension;
+				            $file->move('public/uploads/images/licenseProof/',$filename);
+				            $Images['licenseProof']=$filename;
+				            $user->licenseProof=$this->url."/public/uploads/images/licenseProof/".$filename;
+				        }
+			            Drivers::where('userId',$user->id)->update($Images);
 			        }
+                    $driverDetails['driveId']=$driverDetails->id;
 		            $user->driverDetails=$driverDetails;
 
 		            $ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>""];
 				    $array=array('Driver'=>$user,'ErrorDetail'=>$ErrorDetail,'Result'=>1);
 				    return  response()->json(array('array'=>$array), 200);
 
-			    }
-		        catch(QueryException $ex){
-		         
-		            $ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>$ex->getMessage()];
-				    $array=array('Driver'=>$user,'ErrorDetail'=>$ErrorDetail,'Result'=>0);
-				    return  response()->json(array('array'=>$array), 200);
-		        }
+			    
 	      }
 	      else
 	      {
-	      		$ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>"Driver is Already Registered"];
+	      		$ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>"Mobile Number is Already Existed"];
 			    $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
 			    return  response()->json(array('array'=>$array), 200);
 	      }
+
+	      }
+	        catch(QueryException $ex)
+	        {
+	         	if (!empty($user)) 
+	         	{
+	         		Users::where('userId',$user->id)->delete();
+		    		Drivers::where('userId',$user->id)->delete();
+	         	}
+	         	
+	            $ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>$ex->getMessage()];
+			    $array=array('Driver'=>$user,'ErrorDetail'=>$ErrorDetail,'Result'=>0);
+			    return  response()->json(array('array'=>$array), 200);
+	        }
     }
 
     //Vehicle Registration
     public function vehicleRegistration(Request $request)
     {
     	$validation=Validator::make($request->all(),[
-    													'userId'=> 'required',
+    	                                                'userId'=> 'required',
 										                'driverId' => 'required',
 										                'vihicleNumber' => 'required',
 										                'company'=>'required',
@@ -260,8 +355,6 @@ class SignUpController extends Controller
 										                'plateNumber'=>'required',
 										                'plateType'=>'required',
 										                'vihicleType'=>'required',
-										                'colour'=>'required',
-										                
 											        ]);
     										          
         if($validation->fails())
@@ -275,45 +368,87 @@ class SignUpController extends Controller
         try
         {
 
+            if (preg_match('/[اأإء-ي]/ui', $request->plateLetterLeft))
+            {
+                if (preg_match('/[اأإء-ي]/ui', $request->plateLetterRight))
+                {
+                    if (preg_match('/[اأإء-ي]/ui', $request->plateLetterMiddle))
+                    {
+                        //Just a check
+                    }
+                    else
+                    {
+                        $ErrorDetail=['ErrorDetails'=>"Error in Vehicle Registration",'ErrorMessage'=> "Enter the plate Letters Middle in Arabic"];
+                        $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
+                        return  response()->json(array('array'=>$array), 200);
+                    }
+                }
+                else
+                {
+                    $ErrorDetail=['ErrorDetails'=>"Error in Vehicle Registration",'ErrorMessage'=> "Enter the plate Letters Right in Arabic"];
+                    $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
+                    return  response()->json(array('array'=>$array), 200);
+                }
+            }
+            else
+            {
+                $ErrorDetail=['ErrorDetails'=>"Error in Vehicle Registration",'ErrorMessage'=> "Enter the plate Letters Left in Arabic"];
+                $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
+                return  response()->json(array('array'=>$array), 200);
+            }
+
+
+
+
         
 		        // $str=$request->captainIdentityNumber;
 		      	// if ($str[0]=='1') 
 		      	// {
 					       
 		         $vehicle_data = array("apiKey" => "8EF7AA53-3860-4242-955F-7AC218FDE3C1", "vehicleSequenceNumber" => $request->vihicleNumber, "plateLetterRight" => $request->plateLetterRight,"plateLetterMiddle" =>$request->plateLetterMiddle,"plateLetterLeft"=>$request->plateLetterLeft,"plateNumber"=>$request->plateNumber,"plateType"=>$request->plateType);
+                    if($request->vihicleType!=7)
+                    {
+                        $vehicle_data_string = json_encode($vehicle_data);
+                        $vurl = "https://wasl.elm.sa/WaslPortalWeb/rest/VehicleRegistration/send";
+                        $vehicle_api_response = Mot::call_api($vehicle_data_string,$vurl);
+                        $vehicle_data_decode = json_decode($vehicle_api_response,true);
+                        $vehicleApproval='0';
+                        if($vehicle_data_decode['resultCode']=='100')
+                        {
 
-		                $vehicle_data_string = json_encode($vehicle_data);
-		                $vurl = "https://wasl.elm.sa/WaslPortalWeb/rest/VehicleRegistration/send"; 
-		                $vehicle_api_response = Mot::call_api($vehicle_data_string,$vurl);
-		                $vehicle_data_decode = json_decode($vehicle_api_response,true);
+                            $vehiclerefnumber = $vehicle_data_decode['vehicleReferenceNumber'];
+                            $vehicleApproval='1';
+                            //    $vehiclerefnumber='454885';
+                        }
+                        elseif($vehicle_data_decode['resultCode']!='100')
+                        {
+                            $vehiclerefnumber = 99999;
+                            $vehicleApproval='0';
+//                            if ($vehicle_data_decode['resultMessage']=="General Server Error")
+//                            {
+//
+//                                $vehiclerefnumber = 99999;
+//                                $vehicleApproval='0';
+//
+//                            }
+//                            else
+//                            {
+//                                $errors = $vehicle_data_decode['resultMessage'];
+//                                if (empty($errors)) {
+//                                    $errors="MOt is Not sending Response";
+//                                }
+//                                $ErrorDetail=['ErrorDetails'=>"Error in MOT",'ErrorMessage'=> preg_replace("/[\\n\\r]+/", " ", $errors)];
+//                                $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
+//                                return  response()->json(array('array'=>$array), 200);
+//                            }
+                        }
+                    }
+                    else
+                    {
+                        $vehiclerefnumber = 99999;
+                        $vehicleApproval='0';
+                    }
 
-		                 $vehicleApproval='0';
-
-		                if($vehicle_data_decode['resultCode']=='100')
-		                {
-		                  
-		                    $vehiclerefnumber = $vehicle_data_decode['vehicleReferenceNumber'];
-		                    $vehicleApproval='1';
-		                    //    $vehiclerefnumber='454885';
-		           		}
-		                elseif($vehicle_data_decode['resultCode']!='100')
-		                {
-
-		                    if ($vehicle_data_decode['resultMessage']=="General Server Error") 
-		                    {
-
-		                         $vehiclerefnumber = 99999;
-		                         $vehicleApproval='0';
-
-		                    }
-		                    else
-		                    {
-		                        $errors = $vehicle_data_decode['resultMessage'];
-			                    $ErrorDetail=['ErrorDetails'=>"Error in MOT",'ErrorMessage'=> preg_replace("/[\\n\\r]+/", " ", $errors)];
-					            $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
-					            return  response()->json(array('array'=>$array), 200);
-		                    }   
-		                }
 		     //  	}
 			    // else
 			    // {
@@ -330,7 +465,12 @@ class SignUpController extends Controller
 		        $input['plateNumber']=$request->plateNumber;
 		        $input['plateType']=$request->plateType;
 		        $input['vihicleType']=$request->vihicleType;
-		        $input['colour']=$request->colour;
+
+                if(!empty($request->colour))
+                    $input['colour']=$request->colour;
+                else
+                    $input['colour']="white";
+                
 		        $input['vehicleModel'] = $request->vehicleModel;
 		        $input['vehicleApproval']=$vehicleApproval;
 		        $input['vehicleReferenceNumber']=$vehiclerefnumber;
@@ -356,13 +496,12 @@ class SignUpController extends Controller
 			        	$extension=$file->getClientOriginalExtension();
 			            $filename =$request->userId.".".$extension;
 			            $file->move('public/uploads/images/driverCarImage/',$filename);
-			            $input['carImage']= $filename;
-			            $user->carImage=$this->url."/public/uploads/images/driverCarImage/".$filename;
+			            $input['driverCarImage']= $filename;
+			            $user->driverCarImage=$this->url."/public/uploads/images/driverCarImage/".$filename;
 
 			        }
 
 		        	$user=VehicleDetails::create($input);
-
 		        	Drivers::where('driveId',$request->driverId)->update([ 
 		        														  'vihicleNumber'=>$request->vihicleNumber
 		        														]);

@@ -41,26 +41,22 @@
                     <!--        Here you can write extra buttons/actions for the toolbar              -->
                   </div>
                   <div class="material-datatables">
-                    <table id="datatables" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
+                    <table id="datatables" class="table table-responsive table-striped table-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
                       <thead>
                         <tr>
                           
                         
-		                        <th>D ID</th>                        
-		                        <th>Reg. Date</th>
-		                        <th>Name</th>
-		                        <th>Email</th>
-		                        <th>Mobile</th>
-		                        <th>Device Type</th>
-		                        
-		                        
-		                        <th>Status</th>
-		                        <th>Approved MOT</th>
-		                        
-		                        
-		                        <th>Identity Proof</th>
-                            <th>License Proof</th>
-		                        <th> Action </th>
+		                        <th>{{trans('drivers.D-ID')}}</th>
+		                        <th>{{trans('drivers.Reg-Date')}}</th>
+		                        <th>{{trans('drivers.Name')}}</th>
+		                        <th>{{trans('drivers.Email')}}</th>
+		                        <th>{{trans('drivers.Mobile')}}</th>
+		                        <th>{{trans('drivers.Device-Type')}}</th>
+		                        <th>{{trans('drivers.Status')}}</th>
+		                        <th>{{trans('drivers.Approved-MOT')}}</th>
+		                        <th>{{trans('drivers.Identity-Proof')}}</th>
+                                <th>{{trans('drivers.License-Proof')}}</th>
+		                        <th>{{trans('drivers.Action')}} </th>
                         
                     
                           
@@ -121,8 +117,16 @@
                                     @endif
                                     
                                     <td style="width: 1%;">
-                                        <a href="{{ url('/driverProfile',$driver->driveId) }}">
+                                        <a href="{{ url('/R_drivers_driverProfile',$driver->driveId) }}">
                                         <button  type="button" class="btn btn-info">Profile</button></a>
+                                          
+                                        <a href="{{ url('/R_drivers_approveDriver',$driver->driveId) }}" class="btn btn-success size"><i class="glyphicon glyphicon-trash"></i> Edit</a>
+
+
+
+
+
+
                                     </td>
                                 </tr>
 

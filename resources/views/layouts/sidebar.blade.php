@@ -24,7 +24,7 @@
               <span>
                 {{session()->get('admin_name')}}
                 <br>
-                <i class="fa fa-circle text-success"></i> Online
+                <i class="fa fa-circle text-success"></i> {{trans('sideBar.Admin-Status')}}
                 <b class="caret"></b>
               </span>
             </a>
@@ -33,7 +33,7 @@
                 <li class="nav-item">
                   <a class="nav-link" href="{{route('Admin.logout')}}">
                     <span class="sidebar-mini"> L </span>
-                    <span class="sidebar-normal"> Logout </span>
+                    <span class="sidebar-normal"> {{trans('sideBar.Logout')}} </span>
 
                   </a>
                 </li>
@@ -48,47 +48,115 @@
           <li class="nav-item active ">
             <a class="nav-link" href="{{route('Home')}}">
               <i class="material-icons">dashboard</i>
-              <p> Dashboard </p>
+              <p> {{trans('sideBar.Dashboard')}} </p>
             </a>
           </li>
           <li class="nav-item ">
             <a class="nav-link" data-toggle="collapse" href="#pagesExamples">
               <i ><img src="{{url('public/images/muhrahpanel/driver.png')}}"></i>
              
-              <p> Drivers
+              <p> {{trans('sideBar.Drivers')}}
                 <b class="caret"></b>
               </p>
             </a>
             <div class="collapse" id="pagesExamples">
               <ul class="nav">
-                
+
+
+
+
                 <li class="nav-item ">
-                  <a class="nav-link" href="{{route('Drivers')}}">
-                    <span class="sidebar-mini"> TD </span>
-                    <span class="sidebar-normal"> Total Drivers </span>
+                  <a class="nav-link" data-toggle="collapse" href="#componentsCollapse">
+                    <span class="sidebar-mini"> SOD </span>
+                    <span class="sidebar-normal"> {{trans('sideBar.State-Of-Driver')}}
+                      <b class="caret"></b>
+                    </span>
                   </a>
+                  <div class="collapse" id="componentsCollapse">
+                    <ul class="nav">
+                      <li class="nav-item ">
+                        <a class="nav-link" href="{{route('Drivers')}}">
+                          <span class="sidebar-mini"> TD </span>
+                          <span class="sidebar-normal"> {{trans('sideBar.Types-Of-Drivers')}} </span>
+                        </a>
+                      </li>
+
+                    <li class="nav-item ">
+                        <a class="nav-link" href="{{route('Working.Status',['status'=>'1'])}}" >
+                            <span class="sidebar-mini"> AD </span>
+                            <span class="sidebar-normal"> {{trans('sideBar.Active-Drivers')}} </span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item ">
+                        <a class="nav-link" href="{{route('Working.Status',['status'=>'0'])}}" >
+                            <span class="sidebar-mini"> UAD </span>
+                            <span class="sidebar-normal"> {{trans('sideBar.UnActive-Drivers')}} </span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item ">
+                        <a class="nav-link" href="{{route('Valid.Status',['status'=>'1'])}}" >
+                            <span class="sidebar-mini"> AD </span>
+                            <span class="sidebar-normal"> {{trans('sideBar.Approved-Drivers')}} </span>
+                        </a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link" href="{{route('Valid.Status',['status'=>'0'])}}" >
+                        <span class="sidebar-mini"> NAD </span>
+                            <span class="sidebar-normal"> {{trans('sideBar.Not-Approved-Drivers')}} </span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item ">
+                        <a class="nav-link" href="{{route('Registered.Today')}}" >
+                        <span class="sidebar-mini"> DR </span>
+                            <span class="sidebar-normal"> {{trans('sideBar.Daily-Register')}} </span>
+                        </a>
+                    </li>
+
+                    </ul>
+                  </div>
+                    <hr>
                 </li>
+
+
+
+
+
+
                 <li class="nav-item ">
                   <a class="nav-link" href="{{route('Driver.stat')}}">
                     <span class="sidebar-mini"> ST </span>
-                    <span class="sidebar-normal"> Stats </span>
+                    <span class="sidebar-normal">{{trans('sideBar.Driver-Reports')}} </span>
                   </a>
                 </li>
                <li class="nav-item ">
                   <a class="nav-link" href="{{route('Driver.Create')}}">
                     <span class="sidebar-mini"> RD </span>
-                    <span class="sidebar-normal"> Registed Driver </span>
+                    <span class="sidebar-normal"> {{trans('sideBar.Registed-Driver')}} </span>
                   </a>
                 </li>
 
                 <li class="nav-item ">
                   <a class="nav-link" href="{{route('Driver.Wallets')}}">
                     <span class="sidebar-mini"> DW </span>
-                    <span class="sidebar-normal"> Drivers Wallet </span>
+                    <span class="sidebar-normal"> {{trans('sideBar.Drivers-Wallet')}} </span>
+                  </a>
+                </li>
+                <li class="nav-item ">
+                  <a class="nav-link" href="{{route('Vehicle.vehicleRegistration')}}">
+                    <span class="sidebar-mini"> CT </span>
+                    <span class="sidebar-normal"> CarTypes </span>
                   </a>
                 </li>
 
-
+                <li class="nav-item ">
+                  <a class="nav-link" href="{{route('Driver.searchView')}}">
+                    <span class="sidebar-mini"> SD </span>
+                    <span class="sidebar-normal"> {{trans('sideBar.Search-Drivers')}} </span>
+                  </a>
+                </li>
               </ul>
             </div>
           </li>
@@ -98,77 +166,59 @@
             <a class="nav-link" data-toggle="collapse" href="#componentsExamples">
               <i ><img src="{{url('public/images/muhrahpanel/passenger.png')}}"></i>
               
-              <p> Passengers
+              <p> {{trans('sideBar.Passengers')}}
                 <b class="caret"></b>
               </p>
             </a>
             <div class="collapse" id="componentsExamples">
               <ul class="nav">
                 
-                <li class="nav-item ">
-                  <a class="nav-link" href="{{route('Booking.StatusView')}}">
-                    <span class="sidebar-mini"> BKs </span>
-                    <span class="sidebar-normal"> Bookings </span>
-                  </a>
-                </li>
+                
                 <li class="nav-item ">
                   <a class="nav-link" href="{{route('Passanger')}}">
                     <span class="sidebar-mini"> PA </span>
-                    <span class="sidebar-normal"> Passengers </span>
+                    <span class="sidebar-normal"> {{trans('sideBar.Passengers')}} </span>
                   </a>
                 </li>
                 <li class="nav-item ">
                   <a class="nav-link" href="{{route('Passanger.Wallets')}}">
                     <span class="sidebar-mini"> PW </span>
-                    <span class="sidebar-normal"> Wallets </span>
+                    <span class="sidebar-normal"> {{trans('sideBar.Wallets')}} </span>
                   </a>
                 </li>
-
+                 <li class="nav-item ">
+                  <a class="nav-link" href="{{route('Passanger.stat')}}">
+                    <span class="sidebar-mini"> PS </span>
+                    <span class="sidebar-normal"> {{trans('sideBar.Statistics')}} </span>
+                  </a>
+                </li>
 
               </ul>
             </div>
           </li>
           
-         
+          <li class="nav-item">
+            <a class="nav-link" href="{{route('Booking.StatusView')}}">
+              <i ><img src="{{url('public/images/muhrahpanel/bookings.png')}}"></i>
+              <p> {{trans('sideBar.Bookings')}} </p>
+            </a>
+          </li>
 
 
 
           <li class="nav-item">
             <a class="nav-link" href="{{route('Tracking')}}">
               <i ><img src="{{url('public/images/muhrahpanel/eagle.png')}}"></i>
-              <p> Birds Eye </p>
+              <p> {{trans('sideBar.Birds-Eye-D')}} </p>
             </a>
           </li>
 
-          <li class="nav-item ">
-            <a class="nav-link" data-toggle="collapse" href="#mapsExamples">
-                 <i ><img src="{{url('public/images/muhrahpanel/map.png')}}"></i>
-              <p> Maps
-                <b class="caret"></b>
-              </p>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{{route('Tracking.Passenger')}}">
+              <i ><img src="{{url('public/images/muhrahpanel/eagle.png')}}"></i>
+              <p> {{trans('sideBar.Birds-Eye-P')}} </p>
             </a>
-            <div class="collapse" id="mapsExamples">
-              <ul class="nav">
-                <li class="nav-item ">
-                  <a class="nav-link" href="../examples/maps/google.html">
-                    <span class="sidebar-mini"> GM </span>
-                    <span class="sidebar-normal"> Google Maps </span>
-                  </a>
-                </li>
-                <li class="nav-item ">
-                  <a class="nav-link" href="../examples/maps/fullscreen.html">
-                    <span class="sidebar-mini"> FSM </span>
-                    <span class="sidebar-normal"> Full Screen Map </span>
-                  </a>
-                </li>
-                <li class="nav-item ">
-                  <a class="nav-link" href="../examples/maps/vector.html">
-                    <span class="sidebar-mini"> VM </span>
-                    <span class="sidebar-normal"> Vector Map </span>
-                  </a>
-                </li>
-              </ul>
-            </div>
           </li>
 
 
@@ -176,10 +226,13 @@
 
 
 
+
+        @if(!empty(session()->get('systemrole')['role_name'] == 'superAdmin'))
+           
           <li class="nav-item ">
             <a class="nav-link" data-toggle="collapse" href="#tablesExamples">
                  <i ><img src="{{url('public/images/muhrahpanel/admin.png')}}"></i>
-              <p> Admin
+              <p> {{trans('sideBar.Admin')}}
                 <b class="caret"></b>
               </p>
             </a>
@@ -188,34 +241,98 @@
                 <li class="nav-item ">
                   <a class="nav-link" href="{{route('Admin.details')}}">
                     <span class="sidebar-mini"> AD </span>
-                    <span class="sidebar-normal"> Admin Details </span>
+                    <span class="sidebar-normal"> {{trans('sideBar.Admin-Details')}} </span>
                   </a>
                 </li>
                 <li class="nav-item ">
                   <a class="nav-link" href="{{route('Admin.create')}}">
                     <span class="sidebar-mini"> AR </span>
-                    <span class="sidebar-normal"> Admin Registration </span>
+                    <span class="sidebar-normal">{{trans('sideBar.Admin-Registration')}}  </span>
                   </a>
                 </li>
                 <li class="nav-item ">
-                  <a class="nav-link" href="../examples/tables/datatables.net.html">
+                  <a class="nav-link" href="{{route('Admin.roles')}}">
                     <span class="sidebar-mini"> AP </span>
-                    <span class="sidebar-normal"> Admin Profiles </span>
+                    <span class="sidebar-normal"> {{trans('sideBar.Admin-Roles')}} </span>
                   </a>
                 </li>
+
+
+
+
+                <li class="nav-item ">
+                  <a class="nav-link" data-toggle="collapse" href="#componentsCollapses">
+                    <span class="sidebar-mini"> Com </span>
+                    <span class="sidebar-normal"> Companies
+                      <b class="caret"></b>
+                    </span>
+                  </a>
+                  <div class="collapse" id="componentsCollapses">
+                    <ul class="nav">
+                      <li class="nav-item ">
+                        <a class="nav-link" href="{{route('Admin.newCompanies')}}">
+                          <span class="sidebar-mini"> CR </span>
+                          <span class="sidebar-normal"> Create </span>
+                        </a>
+                      </li>
+
+                      <li class="nav-item ">
+                        <a class="nav-link" href="{{route('Admin.Companies')}}" >
+                          <span class="sidebar-mini"> AD </span>
+                          <span class="sidebar-normal"> Companies </span>
+                        </a>
+                      </li>
+
+
+
+                    </ul>
+                  </div>
+                  <hr>
+                </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
               </ul>
             </div>
           </li>
-
+          @endif 
           
           <li class="nav-item ">
             <a class="nav-link" href="{{route('Vehicle.allTypes')}}">
                <i ><img src="{{url('public/images/muhrahpanel/car.png')}}"></i>
-              <p> Cars Details</p>
+              <p> {{trans('sideBar.Cars-Details')}}</p>
             </a>
           </li>
 
+          <li class="nav-item ">
+            <a class="nav-link" href="{{route('distance.createView')}}">
+              <i ><img src="{{url('public/images/muhrahpanel/map.png')}}"></i>
+              <p> {{trans('sideBar.Distance')}}</p>
+            </a>
+          </li>
 
+          <li class="nav-item ">
+            <a class="nav-link" href="{{route('version.get')}}">
+              <i ><img src="{{url('public/images/muhrahpanel/version.png')}}" style="width: 32px; height: 32px;" ></i>
+              <p> Version Check</p>
+            </a>
+          </li>
 
         </ul>
       </div>

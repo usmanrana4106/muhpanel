@@ -34,7 +34,7 @@
                   <div class="card-icon">
                     <i class="material-icons">assignment</i>
                   </div>
-                  <h4 class="card-title">Admin Details</h4>
+                  <h4 class="card-title">{{trans('adminDetails.Admin-Details')}}</h4>
                 </div>
                 <div class="card-body">
                   <div class="toolbar">
@@ -45,12 +45,13 @@
                       <thead>
                         <tr>
                           
-                          <th >Admin Id</th>
-                          <th >Admin </th>
-                          <th >Email  </th>
-                          <th >Status </th>
-                          <th >created_at</th>
-                          <th> Action</th>
+                          <th >{{trans('adminDetails.AdminId')}}</th>
+                          <th >{{trans('adminDetails.Admin')}} </th>
+                          <th >{{trans('adminDetails.Email')}}</th>
+                          <th >{{trans('adminDetails.Status')}}</th>
+                          <th >{{trans('adminDetails.Role')}}</th>
+                          <th >{{trans('adminDetails.created_at')}}</th>
+                          <th>{{trans('adminDetails.Action')}} </th>
                         </tr>
                       </thead>
                       
@@ -63,12 +64,13 @@
                                     <td >{{ $Admin->admin_name }}</td>
                                     <td >{{ $Admin->email }}</td>
                                     <td >{{ $Admin->status }}</td>
+                                    <td >{{ $Admin->role_name }}</td>
                                     <td >{{ $Admin->created_at }}</td>
                                		<td >
-                               			<a href="{{ url('/editAdmin',$Admin->admin_id) }}">
+                               			<a href="{{ url('/U_admin_editAdmin',$Admin->admin_id) }}">
                                         		<button  type="button" class="btn btn-success size">Edit</button>
                                         </a>
-                                        <a href="{{ url('/deleteAdmin',$Admin->admin_id) }}">
+                                        <a href="{{ url('/D_admin_deleteAdmin',$Admin->admin_id) }}">
                                         		<button  type="button" class="btn btn-danger size">Delete</button>
                                         </a>
                                     </td>

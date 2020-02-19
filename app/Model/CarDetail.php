@@ -9,6 +9,6 @@ class CarDetail extends Model
     protected $table = 'cardetail';
     public $timestamps = false;
  	protected $fillable = [
-						        'carId', 'carName', 'carSheet', 'carImage', 'Counterprice', 'priceByDistence', 'priceByTime', 'rushHoursPBD', 'rushHoursPBT', 'status', 'crd', 'upd'
-						    ];
+						     'carId', 'carName','arabicName','priority','carSheet', 'carImage', 'Counterprice', 'priceByDistence', 'priceByTime', 'rushHoursPBD', 'rushHoursPBT', 'status', 'crd', 'upd'
+                          ];
 }

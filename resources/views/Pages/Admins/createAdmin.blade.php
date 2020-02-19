@@ -28,7 +28,7 @@
               <div class="card ">
                 <div class="card-header card-header-rose card-header-text">
                   <div class="card-text">
-                    <h4 class="card-title">Create Admin</h4>
+                    <h4 class="card-title">{{trans('createAdmin.Create-Admin')}}</h4>
 
                        @if(count($errors))
                         <div class="alert alert-danger">
@@ -49,7 +49,7 @@
                         	 	{{ csrf_field() }}
                           
                     <div class="row">
-                      <label class="col-sm-2 col-form-label">Admin Name</label>
+                      <label class="col-sm-2 col-form-label">{{trans('createAdmin.Admin-Name')}}</label>
                       <div class="col-sm-5">
                         <div class="form-group">
                           <input type="text" class="form-control" name="admin_name" id="admin_name"  required>
@@ -58,7 +58,7 @@
                       </div>
                     </div>
                     <div class="row">
-                      <label class="col-sm-2 col-form-label">Email</label>
+                      <label class="col-sm-2 col-form-label">{{trans('createAdmin.Email')}}</label>
                       <div class="col-sm-5">
                         <div class="form-group">
                           <input type="email" class="form-control" name="email" id="email"  required>
@@ -68,7 +68,7 @@
                     </div>
 
                     <div class="row">
-                      <label class="col-sm-2 col-form-label">Password</label>
+                      <label class="col-sm-2 col-form-label">{{trans('createAdmin.Password')}}</label>
                       <div class="col-sm-5">
                         <div class="form-group">
                           <input type="password" class="form-control" name="password" id="password" required>
@@ -78,7 +78,7 @@
                     </div>
 
                     <div class="row">
-                      <label class="col-sm-2 col-form-label">Confirm Password</label>
+                      <label class="col-sm-2 col-form-label">{{trans('createAdmin.Confirm-Password')}}</label>
                       <div class="col-sm-5">
                         <div class="form-group">
                           <input type="password" class="form-control" name="confirmpassword" id="confirmpassword"  required>
@@ -87,8 +87,31 @@
                       </div>
                     </div>
                     
-                    <div class="col-sm-12">
-                          <button type="submit" class="btn btn-raised ">Submit</button>   
+                     <div class="row">
+                      <label class="col-sm-2 col-form-label">{{trans('createAdmin.Admin-Role')}}</label>
+                      <div class="col-sm-5">
+                        <div class="form-group">
+                            <select class="selectpicker" name="role_id" data-size="7" data-style="select-with-transition" title="Single Select" required>
+                                  <option value=""> </option>
+
+                                @if(!empty($adminRoles))
+                                  @foreach($adminRoles as $adminRole)
+                                  <option value="{{$adminRole->role_id}}"> {{$adminRole->role_name}} </option>
+                                  @endforeach
+                                @endif
+                          </select>
+                          <span class="bmd-help">Admin Roles</span>
+                        </div>
+                      </div>
+                    </div>
+
+
+
+
+
+
+                    <div class="col-sm-12 ">
+                          <button type="submit" class="btn btn-raised ">Save</button>   
                     </div>
                   </form>
                 </div>

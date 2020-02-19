@@ -8,14 +8,27 @@ use Illuminate\Support\Facades\DB;
 
 use App\Model\Drivers;
 use App\Model\VehicleDetails;
-use App\Model\Bookings;
+
+
+
+
+use App\Model\Bookings\Bookings;
+use App\Model\Bookings\BookingDetails;
+use App\Model\Bookings\BookingBroadCasting;
+use App\Model\Bookings\BookingProgress;
+use App\Model\Bookings\BookingComplete;
+
+
+
+use App\Model\Nationality;
 use App\Model\MOT;
 use App\Model\Users;
 use App\Model\CarDetail;
 use App\Model\CarCompanies;
 use App\Model\DriverWallet;
+use App\Model\Notification;
 
-//*****Created By Usman Abbas*******//
+//*******Created By Usman Abbas*******//
 class DriverController extends Controller
 {
     protected $url;
@@ -27,7 +40,17 @@ class DriverController extends Controller
     
     public function getDrivers()
     {
-      return view('Pages.Drivers.driversType');
+      $TotalApprovedDrivers=Drivers::where(['identityProofStatus'=>'1','licenceNumberStatus'=>'1'])->count();
+      $TotalUnApprovedDrivers=Drivers::where('identityProofStatus','=','0')->orWhere('licenceNumberStatus','=','0')->count();
+      $TotalActiveDrivers=Users::where(['status'=>'1','userType'=>'driver'])->count();
+      $TotalUnActiveDrivers=Users::where(['status'=>'0','userType'=>'driver'])->count();
+
+      $Date=date('Y-m-d');
+      $startDate=date("Y-m-d",strtotime($Date)).' 00:00'; //00:00 start day time
+      $endDate=date("Y-m-d",strtotime($Date)).' 23:59'; //23:59 end day time
+
+      $dailRegisteredDrivers=Drivers::whereBetween('crd', [$startDate, $endDate])->where('mobileNumber', '!=', 0)->count();
+      return view('Pages.Drivers.driversType',compact('TotalApprovedDrivers','TotalUnApprovedDrivers','TotalActiveDrivers','TotalUnActiveDrivers','dailRegisteredDrivers'));
     }
 
     public function getTotalDriver()
@@ -42,18 +65,15 @@ class DriverController extends Controller
       if ($status==1)
       {
          $title='Total Approved Drivers';
-        $Drivers=Drivers::where(['identityProofStatus'=>'1','licenceNumberStatus'=>'1'])->get();
-        return view('Pages.Drivers.totalDriver',compact('Drivers','title'));
+        return view('Pages.Drivers.totalDriver',compact('title'));
       }
       elseif ($status==0) 
       {
         $title='Total UnApproved Drivers';
-        $Drivers=Drivers::where('identityProofStatus','=','0')->orWhere('licenceNumberStatus','=','0')->get();
-        return view('Pages.Drivers.totalDriver',compact('Drivers','title'));
+        return view('Pages.Drivers.totalDriver',compact('title'));
       }
       else
         return redirect()->route('Home');
-       
     }
 
     public function getactiveOrUnActive($status)
@@ -61,48 +81,151 @@ class DriverController extends Controller
       if ($status==1) 
       {
         $title='Total Active Drivers';
-         $Drivers=Users::select('driverdetail.driveId', 'driverdetail.userId', 'fullName', 'driverdetail.mobileNumber', 'driverdetail.identityProofStatus', 'driverdetail.licenceNumberStatus','users.status','driverdetail.crd' ,'bankName','accountNo','vihicleNumber','captainIdentityNumber','driverdetail.address')->where(['users.status'=>'1','users.userType'=>'driver'])
-                          ->leftJoin('driverdetail', 'users.userId', '=', 'driverdetail.userId')->get();
-        return view('Pages.Drivers.totalDriver',compact('Drivers','title'));
+        return view('Pages.Drivers.totalDriver',compact('title'));
 
       }
       elseif ($status==0) 
       {
         $title='Total UnActive Drivers';
-         $Drivers=Users::select('driverdetail.driveId', 'driverdetail.userId', 'fullName', 'driverdetail.mobileNumber', 'driverdetail.identityProofStatus', 'driverdetail.licenceNumberStatus','bankName','accountNo','users.status','vihicleNumber','captainIdentityNumber','driverdetail.crd','driverdetail.address' )->where(['users.status'=>'0','users.userType'=>'driver'])
-                          ->leftJoin('driverdetail', 'users.userId', '=', 'driverdetail.userId')->get();
-        return view('Pages.Drivers.totalDriver',compact('Drivers','title'));
+        return view('Pages.Drivers.totalDriver',compact('title'));
       }
        else
         return redirect()->route('Home');
       // return view('Pages.Drivers.totalDriver',compact('Drivers'));
     }
 
+    public function dailyRegisteredDrivers()
+    {
+       $title='Daily Registered Drivers';
+       return view('Pages.Drivers.dailyRegisteredDrivers',compact('title'));
+    }
+
+    public function driversWithCars($carType)
+    {
+        return view('Pages.Drivers.totalDriversOf_vehicles',compact('carType'));
+
+    }
+
+
+   public function updateProfileImage(Request $request)
+   {
+      $file=$request->file('profileImage');
+      if($file)
+      {
+          $extension=$file->getClientOriginalExtension();
+          $filename =$request->userId.".".$extension;
+          $file->move('public/uploads/images/driverImage/',$filename);
+          Users::where('userId',$request->userId)->update(['profileImage'=> $filename]);
+          session()->flash('uploadImage', 'Driver Profile Image is Successfully Updated');
+          return redirect()->route('Driver.ApproveView',$request->driverId);
+      }
+   }
+   public function updateIdentityProof(Request $request)
+   {
+      $file=$request->file('identityProof');
+      if($file)
+      {
+          $extension=$file->getClientOriginalExtension();
+          $filename =$request->userId.".".$extension;
+          $file->move('public/uploads/images/identityProof/',$filename);
+          $Images['identityProof']=$filename;
+          Drivers::where('userId',$request->userId)->update($Images);
+          session()->flash('uploadImage', 'Driver IdentityProof Image is Successfully Updated');
+          return redirect()->route('Driver.ApproveView',$request->driverId);
+      }
+   }
+   public function updateLicenseProof(Request $request)
+   {
+      $file=$request->file('licenseProof');
+      if($file)
+      {
+        $extension=$file->getClientOriginalExtension();
+        $filename =$request->userId.".".$extension;
+        $file->move('public/uploads/images/licenseProof/',$filename);
+        $Images['licenseProof']=$filename;
+        Drivers::where('userId',$request->userId)->update($Images);
+        session()->flash('uploadImage', 'Driver license Proof Image is Successfully Updated');
+        return redirect()->route('Driver.ApproveView',$request->driverId);
+      }
+      else
+      {
+
+      }
+   }
+   public function updateVehicleProof(Request $request)
+   {
+      $file=$request->file('vechicleIdentityProof');
+      if($file)
+      {
+        $extension=$file->getClientOriginalExtension();
+        $filename =$request->userId.".".$extension;
+        $file->move('public/uploads/images/vehicleProof/',$filename);
+        $input['vechicleIdentityProof']= $filename;
+        VehicleDetails::where('driverId',$request->driverId)->update($input);
+        session()->flash('uploadImage', 'Driver VechicleIdentityProof Image is Successfully Updated');
+        return redirect()->route('Driver.ApproveView',$request->driverId);
+      }
+      else
+      {
+
+      }
+   }
+   public function updateDriverCarImage(Request $request)
+   {
+      $file=$request->file('driverCarImage');
+      if($file)
+      {
+        $extension=$file->getClientOriginalExtension();
+          $filename =$request->userId.".".$extension;
+          $file->move('public/uploads/images/driverCarImage/',$filename);
+          $input['driverCarImage']= $filename;
+          VehicleDetails::where('driverId',$request->driverId)->update($input);
+          session()->flash('uploadImage', 'Driver driver CarImage  is Successfully Updated');
+          return redirect()->route('Driver.ApproveView',$request->driverId);
+      }
+      else
+      {
+
+      }
+   }
+
+
+   public function searchDrivers()
+   {
+      $nationalities=Nationality::all();
+      return view('Pages.Drivers.searchDrivers',compact('nationalities'));
+   }
+
+   public function searchbasedDrivers(Request $request)
+   {
+      $request->request->remove('_token');
+      $Drivers=Drivers::getDriverSearchBased($request->all(),$request->fullName);
+      return view('Pages.Drivers.totalDriverUsers',compact('Drivers'));
+   }
+
+
+
+
 
 
     public function driverStats()
     {
-
           $Driver=Users::where('userType','driver')->count();
-          $online=Users::where(['userType'=>'driver','loginStatus'=>'1'])->count();
-          $offline=Users::where(['userType'=>'driver','loginStatus'=>'2'])->count();
           $login=Users::where(['userType'=>'driver','isLoggedIn'=>'1'])->count();
           $logout=Users::where(['userType'=>'driver','isLoggedIn'=>'2'])->count();
+          $online=Users::where(['userType'=>'driver','loginStatus'=>'1'])->count();
+          $offline=Users::where(['userType'=>'driver','loginStatus'=>'2'])->count();
           $free=Drivers::where('driverStatus','1')->count();
           $ride=Drivers::where('driverStatus','3')->count();
-          $accept=DB::table('bookingdetail')->where('driverStatus','2')->count();
-          $ontheway=DB::table('bookings')->where('rideStatus','6')->count();
-          $unapprove=Drivers::where('identityProofStatus','0'&&'licenceNumberStatus','0')->count();
-          $Approve=Drivers::where('identityProofStatus','1'&&'licenceNumberStatus','1')->count();
-          $passenger=Users::where('userType','passenger')->count();
+          $unapproved=Drivers::where('identityProofStatus','0')->orWhere('licenceNumberStatus','0')->count();
+          $Approved=Drivers::where(['identityProofStatus'=>'1','licenceNumberStatus'=>'1'])->count();
           $notapprovedMOT=Users::where(['userType'=>'driver','notapprovedMOT'=>'1'])->count();
-
-  
-         return view('Pages.Drivers.statsOfDriver',
-                                                  compact(
-                                                           'userdetails','admin','Driver','online','offline','login','logout','free','ride','accept','ontheway','Approve','unapprove','passenger','notapprovedMOT'
-                                                         ));
-        
+          $TotalActiveDrivers=Users::where(['status'=>'1','userType'=>'driver'])->count();
+          $TotalUnActiveDrivers=Users::where(['status'=>'0','userType'=>'driver'])->count();
+         
+         return view('Pages.Drivers.statsOfDriver',compact(
+                                                            'Driver','login','online','offline','TotalUnActiveDrivers','logout','free','ride','Approved','unapproved','TotalActiveDrivers','notapprovedMOT'
+                                                          ));
     }
 
     public function getDriverProfile($driverId)
@@ -118,7 +241,7 @@ class DriverController extends Controller
         }
         else
         {
-            $driverInfo->identityProof=$this->url."/uploads/images/identityProof/".$driverInfo->identityProof;              
+            $driverInfo->identityProof=$this->url."/public/uploads/images/identityProof/".$driverInfo->identityProof;              
         }
         if(empty($driverUserInfo->profileImage))
         {
@@ -126,20 +249,25 @@ class DriverController extends Controller
         }
         else
         {
-            $driverUserInfo->profileImage=$this->url."/uploads/images/driverImage/".$driverUserInfo->profileImage;
+            $driverUserInfo->profileImage=$this->url."/public/uploads/images/driverImage/".$driverUserInfo->profileImage;
         }
-        
+          
+        if($driverUserInfo->licenseProof != 'undefined')
+        {
+            $driverUserInfo->licenseProof=$this->url."/public/uploads/images/driverImage/".$driverUserInfo->licenseProof;
+        }
+
         if(empty($VehicleInfo->vechicleIdentityProof))
         {
            $VehicleInfo['vechicleIdentityProof']="not Avaliable";
         }
         else
         {
-           $VehicleInfo->vechicleIdentityProof=$this->url."/uploads/images/vehicleProof/".$VehicleInfo->vechicleIdentityProof;
+           $VehicleInfo->vechicleIdentityProof=$this->url."/public/uploads/images/vehicleProof/".$VehicleInfo->vechicleIdentityProof;
         }
-
-        $Bookings=Bookings::getDriverBookings($driverInfo->userId);
-        return view('Pages.Drivers.driverProfile',compact('driverUserInfo','driverInfo','VehicleInfo','Bookings'));
+        $Wallet=DriverWallet::where('driverId',$driverInfo->userId)->first();
+        //$Bookings=BookingComplete::getDriverBookingsComplete($driverInfo->userId);
+        return view('Pages.Drivers.driverProfile',compact('driverUserInfo','driverInfo','VehicleInfo','Wallet'));
     }
 
     public function onlineDrivers()
@@ -153,8 +281,9 @@ class DriverController extends Controller
     {
       $carTypes=CarDetail::all();
       $companies=CarCompanies::all();
+      $nationalities=Nationality::all();
       $status=session()->get('status');
-       return view('Pages.Drivers.insertDriver',compact('carTypes','status','companies'));
+       return view('Pages.Drivers.insertDriver',compact('carTypes','status','companies','nationalities'));
     }
 
     public function registeredDriver(Request $request)
@@ -178,9 +307,8 @@ class DriverController extends Controller
                                         'plateLetterLeft' => 'required',
                                         'plateNumber' => 'required',
                                         'plateType' => 'required',
-                                        'vihicleType' => 'required'
-                                        
-                                        
+                                        'vihicleType' => 'required',
+                                        'nationality' =>'required'
                                      ]);
 
         $user = Users::where('email','=', $request->email)->orWhere('mobileNumber','=', $request->mobileNumber)->first();
@@ -207,45 +335,47 @@ class DriverController extends Controller
           {
             $input['licenceNumberStatus']=1;
           }
-          //     $input['dateOfBirth']=$request->day."-".$request->month."-".$request->year;
+          $data['dateOfBirth']=$request->day."-".$request->month."-".$request->year;
+          $data['email']=$request->email;
+          $data['mobileNumber']=$request->mobileNumber;
+          $data['captainIdentityNumber']=$request->captainIdentityNumber;
 
-          // $driver_data = array("apiKey" => "8EF7AA53-3860-4242-955F-7AC218FDE3C1", "captainIdentityNumber" => $request->captainIdentityNumber , "dateOfBirth" =>  $input['dateOfBirth'],"emailAddress" =>$request->email,"mobileNumber"=>$request->mobileNumber); 
-
-          //       $driver_data_string = json_encode($driver_data); 
-          //       $url = "https://wasl.elm.sa/WaslPortalWeb/rest/DriverRegistration/send"; 
-          //       $driver_api_response = MOT::call_api($driver_data_string,$url);
-          //       $notapprovedMOT='0';
-          //       $data_decode = json_decode($driver_api_response,true);
-
-          //       if($data_decode['resultCode']=='100')
-          //       {
-          //           $ReferenceNumber = $data_decode['referenceNumber'];
-          //       }
-
-          //       return $data_decode;
-          //       if($data_decode['resultCode']!='100')
-          //       {
-          //           if ($data_decode['resultMessage']=="General Server Error") 
-          //           {
-          //               $ReferenceNumber = 99999;
-          //               $notapprovedMOT='1';
-          //           }
-          //           else
-          //           {
-          //               $errors = $data_decode['resultMessage'];
-          //               $response = array('status'=>0,'message'=>preg_replace("/[\\n\\r]+/", " ", $errors));
-          //               return  response()->json(array('array'=>$response), 200);
-          //           }           
-          //       }
+          $driverReferenceNumber = 99999;
+          $input['notapprovedMOT']=1;
 
 
 
 
 
+
+          if ($request->motDriver=="on")
+          {
+             $response=MOT::hitMotForDriver($data);
+             if($response['error']==1) 
+             {
+               return "Driver Registration MOT Error : ".$response['errorMessage'];
+             }
+
+             $driverReferenceNumber = $response['ReferenceNumber'];
+             $input['notapprovedMOT']=0;
+          }
+
+          $vehicleReferenceNumber=1111;
+          $vehicleApproval=0;
+          if ($request->motVehicle=="on") 
+          {
+            $response=MOT::hitMotForDriverVehicle($input);
+            if ($response['error']==1) 
+            {
+                return "Vehicle Registration MOT Error : ".$response['errorMessage'];
+            }
+            
+            $vehicleReferenceNumber=$response['vehiclerefnumber'];
+            $vehicleApproval=1;
+          }
 
             $authToken=$this->quickRandom();
             $input['authToken']=$authToken;
-            $input['notapprovedMOT']=0;
             $input['status']=1;
             $input['deviceType']=3;
             $input['deviceToken']='sdadsadas';
@@ -266,13 +396,13 @@ class DriverController extends Controller
                 $user->profileImage=$this->url."/public/uploads/images/driverImage/".$filename;
             }
 
-              $input['userId']=$user->id;
-              $input['driverReferenceNumber']=99999;
-              $input['dateOfBirth']=$request->year."-".$request->month."-".$request->day;
-              $driverDetails=Drivers::create($input);
+            $input['userId']=$user->id;
+            $input['driverReferenceNumber']=$driverReferenceNumber;
+            $input['dateOfBirth']=$request->year."-".$request->month."-".$request->day;
+            $input['nationality']=$request->nationality;
+            $driverDetails=Drivers::create($input);
 
-              $file=$request->file('identityProof');
-            
+            $file=$request->file('identityProof');
             if($file)
             {
                 $extension=$file->getClientOriginalExtension();
@@ -282,6 +412,24 @@ class DriverController extends Controller
                 $user->identityProof=$this->url."/public/uploads/images/identityProof/".$filename;
             }
             //create Vehicle
+            $input2=[
+                        'driverId'=>$driverDetails->id,
+                        'vehicleModel'=>$request->vehicleModel,
+                        'vihicleType'=>$request->vihicleType,
+                        'company'=>$request->company, 
+                        'brands'=>$request->brands,
+                        'colour'=>$request->colour, 
+                        'vihicleNumber'=>$request->vihicleNumber, 
+                        'plateLetterRight'=>$request->plateLetterRight, 
+                        'plateLetterMiddle'=>$request->plateLetterMiddle, 
+                        'plateLetterLeft'=>$request->plateLetterLeft, 
+                        'plateType'=>$request->plateType, 
+                        'plateNumber'=>$request->plateNumber, 
+                        'vehicleReferenceNumber'=>$vehicleReferenceNumber, 
+                        'vehicleApproval'=>$vehicleApproval,
+                        'vechicleIdentityProof'=>1
+                    ];
+          VehicleDetails::create($input2);
           return redirect()->route('Drivers');
     }
 
@@ -289,6 +437,7 @@ class DriverController extends Controller
     {
        $carTypes=CarDetail::all();
        $companies=CarCompanies::all();
+       $nationalities=Nationality::all();
        $status=session()->get('status');
        $driverDetails=Drivers::where('driveId',$driverId)->first();
        if (!empty($driverDetails)) 
@@ -300,7 +449,7 @@ class DriverController extends Controller
             if (!empty($vehicleDetails))
             {
               $dateOfBirth=explode('-', $driverDetails->dateOfBirth);
-               return view('Pages.Drivers.approvalPage',compact('carTypes','status','companies','driverDetails','driverUser','dateOfBirth','vehicleDetails'));
+               return view('Pages.Drivers.approvalPage',compact('carTypes','status','companies','driverDetails','driverUser','dateOfBirth','vehicleDetails','nationalities'));
             }
             else
             {
@@ -342,7 +491,8 @@ class DriverController extends Controller
                                         'plateLetterLeft' => 'required',
                                         'plateNumber' => 'required',
                                         'plateType' => 'required',
-                                        'vihicleType' => 'required'
+                                        'vihicleType' => 'required',
+                                        'nationality' => 'required'
                                      ]);
        
        if (!empty($request->userId))
@@ -355,7 +505,44 @@ class DriverController extends Controller
        }
        if (!empty($request->driverId)) 
        {
-         $dateOfBirth=$request->year."-".$request->month."-".$request->day;
+
+
+            $url="https://wasl.api.elm.sa/api/dispatching/v2/drivers";
+           $mot_data=[
+               'driver'=>[
+
+                   "identityNumber" => "1234567890",
+                   "dateOfBirthHijri" => "1420/01/01",
+                   "emailAddress" => "address@email.com",
+                   "mobileNumber" => "+966512345678"
+
+               ],
+               'vehicle'=>[
+                   "sequenceNumber"=> "123456879",
+                   "plateLetterRight"=> "ا",
+                   "plateLetterMiddle"=> "ا",
+                   "plateLetterLeft"=> "ا",
+                   "plateNumber"=> "1234",
+                   "plateType"=> "1"
+               ]
+           ];
+
+//           $response=MOT::motNewApi($mot_data,$url);
+//           $response2=json_encode($response);
+//           print_r($response2);
+//           die;
+
+
+
+
+
+
+
+
+
+
+
+           $dateOfBirth=$request->year."-".$request->month."-".$request->day;
          $identityProofStatus=0;
          $licenceNumberStatus=0;
          if ($request->identityProofStatus== 'on') 
@@ -366,6 +553,67 @@ class DriverController extends Controller
           {
             $licenceNumberStatus=1;
           }
+
+          $data['dateOfBirth']=$request->day."-".$request->month."-".$request->year;
+          $data['email']=$request->email;
+          $data['mobileNumber']=$request->mobileNumber;
+          $data['captainIdentityNumber']=$request->captainIdentityNumber;
+
+          
+          if ($request->motDriver=="on") 
+          {
+             $response=MOT::hitMotForDriver($data);
+             if($response['error']==1) 
+             {
+               return "Driver Registration MOT Error : ".$response['errorMessage'];
+             }
+
+             $driverReferenceNumber = $response['ReferenceNumber'];
+             $input['notapprovedMOT']=0;
+          }
+          else
+          {
+            if (empty($request->driverReferenceNumber)) 
+            {
+               $driverReferenceNumber = 99999;
+               $input['notapprovedMOT']=1;
+            }
+            else
+            {
+              $driverReferenceNumber = $request->driverReferenceNumber;
+              $input['notapprovedMOT']=1;
+            }
+          }
+
+          $input=$request->all();
+         
+          if ($request->motVehicle=="on") 
+          {
+            $response=MOT::hitMotForDriverVehicle($input);
+            if ($response['error']==1) 
+            {
+                return "Vehicle Registration MOT Error : ".$response['errorMessage'];
+            }
+            
+            $vehicleReferenceNumber=$response['vehiclerefnumber'];
+            $vehicleApproval=1;
+          }
+          else
+          {
+             if (empty($request->vehicleReferenceNumber)) 
+              {
+                 $vehicleReferenceNumber=1111;
+                 $vehicleApproval=0;
+              }
+              else
+              {
+                $vehicleReferenceNumber=$request->vehicleReferenceNumber;
+                 $vehicleApproval=1;
+              }
+          }
+
+
+
           Drivers::where('driveId',$request->driverId)->update([
                                                                   'fullName'=>$request->fullName,
                                                                   'dateOfBirth'=>$dateOfBirth,
@@ -374,7 +622,9 @@ class DriverController extends Controller
                                                                   'captainIdentityNumber'=>$request->captainIdentityNumber,
                                                                   'licenceNumberStatus'=>$licenceNumberStatus,
                                                                   'identityProofStatus'=>$identityProofStatus,
-                                                                  'accountNo'=>$request->accountNo
+                                                                  'accountNo'=>$request->accountNo,
+                                                                  'nationality'=>$request->nationality,
+                                                                  'driverReferenceNumber'=>$driverReferenceNumber,
                                                                 ]);
        }
        if (!empty($request->vihicleId)) 
@@ -389,13 +639,146 @@ class DriverController extends Controller
                                                                             'plateLetterLeft' => $request->plateLetterLeft,
                                                                             'plateNumber' => $request->plateNumber,
                                                                             'plateType' => $request->plateType,
-                                                                            'vihicleType' => $request->vihicleType
+                                                                            'vihicleType' => $request->vihicleType,
+                                                                            'vehicleReferenceNumber'=>$vehicleReferenceNumber, 
                                                                           ]);
        }
 
        session()->flash('status', 'Driver Profile is Successfully Updated');
        return redirect()->route('Driver.ApproveView',$request->driverId);
     }
+
+
+    public function freeDriver($userId)
+    {
+        $user=Users::where(['userId'=>$userId,'userType'=>'driver'])->first();
+        Drivers::where('userId',$userId)->update(['driverStatus'=>'1']);
+        $result=1;
+        if ($user->deviceType == 1) 
+         {
+              $notifyResponse=Notification::notify(array($user->deviceToken), 'booking free' , "", '1', 'silent');
+              $notifyResult=json_decode($notifyResponse);
+               if ($notifyResult->success==1) 
+               {
+                   $result=1;
+               }
+               elseif ($notifyResult->success==0) 
+               {
+                   $result=0;
+               }
+         }
+         else
+         {
+              $result=Notification::silentNotifyiOS($user->deviceToken);
+         }
+       $url = URL::previous();
+       session()->put('free','yes');
+       if ($result == 1) 
+       {
+          session()->flash('driverFree','yes');
+       }
+       return redirect($url);
+    } 
+
+
+    public function logoutDriver($userId)
+    {
+        $user=Users::where(['userId'=>$userId,'userType'=>'driver'])->first();
+        Drivers::where('userId',$userId)->update(['driverStatus'=>'1']);
+        $result=1;
+        if ($user->deviceType == 1) 
+         {
+              $notifyResponse=Notification::notify(array($user->deviceToken), 'logout' , "", '1', 'logout');
+              $notifyResult=json_decode($notifyResponse);
+               if ($notifyResult->success==1) 
+               {
+                   $result=1;
+               }
+               elseif ($notifyResult->success==0) 
+               {
+                   $result=0;
+               }
+         }
+         else
+         {
+              $result=Notification::silentNotifyiOS($user->deviceToken);
+         }
+       $url = URL::previous();
+       session()->put('free','yes');
+       if ($result == 1) 
+       {
+          session()->flash('driverFree','yes');
+       }
+       return redirect($url);
+    } 
+
+    public function deleteDrivers($userId)
+    {
+        //delete User done
+        //delete driver done
+        //delete vehicle done
+        //delete wallet done
+        // delete all images done
+        // delete bookings
+      // $driver=Drivers::where('userId',$userId)->first();
+       $user=Users::where(['userId'=>$userId,'userType'=>'driver'])->first();
+      // $profileImage = 'public/uploads/images/driverImage/'.$user->profileImage; // Value is not URL but directory file path
+      // if(File::exists($profileImage)) {
+      //     File::delete($profileImage);
+      // }
+      // $identityProof = 'public/uploads/images/identityProof/'.$driver->identityProof;// Value is not URL but directory file path
+      // if(File::exists($identityProof)) {
+      //     File::delete($identityProof);
+      // }
+      // $licenseProof = 'public/uploads/images/licenseProof/'.$driver->licenseProof;  // Value is not URL but directory file path
+      // if(File::exists($licenseProof)) {
+      //     File::delete($licenseProof);
+      // }
+      // $vechicleIdentityProof = 'public/uploads/images/vehicleProof/'.$driver->vechicleIdentityProof;// Value is not URL but directory file path
+      // if(File::exists($vechicleIdentityProof)) {
+      //     File::delete($vechicleIdentityProof);
+      // }
+      // $driverCarImage='public/uploads/images/driverCarImage/'.$driver->driverCarImage;// Value is not URL but directory file path
+      // if(File::exists($driverCarImage)) {
+      //     File::delete($driverCarImage);
+      // }    
+      // Users::where('userId',$userId)->delete();
+      // Drivers::where('userId',$userId)->delete();
+      // if(!empty($driver))
+      // {
+      //    VehicleDetails::where('driverId',$driver->driveId)->delete();
+      // }
+      // DriverWallet::where('driverId',$userId)->delete();
+       $input=['mobileNumber'=>0,'unactive'=>$user->mobileNumber];
+       Users::where('userId',$userId)->update($input);
+       Drivers::where('userId',$userId)->update(['mobileNumber'=>'0']);
+       if ($user->deviceType == 1) 
+         {
+              $notifyResponse=Notification::silentNotify(array($user->deviceToken),$user->userType);
+         }
+         else
+         {
+              $result=Notification::silentNotifyiOS($user->deviceToken);
+         }
+         
+         
+       $url = URL::previous();
+       session()->flash('uncative','yes');
+       return redirect($url);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     //Drivers Wallet
     public function driversWallets()

@@ -9,7 +9,7 @@ class PassengerRating extends Model
 	protected $table = 'passengerrating';
     public $timestamps = false;
  	protected $fillable = [
-                            'ratingId', 'passengerId', 'bookingId', 'driverId', 'rate', 'review', 'status'
+                            'ratingId', 'passengerId', 'bookingId', 'driverId', 'rate', 'review', 'status','crd','upd'
                           ];
     
 }

@@ -13,6 +13,6 @@ class Users extends Model
                             'email','imeiNumber', 'mobileNumber', 'password', 'profileImage',
                             'socialId', 'socialType', 'deviceToken', 'deviceType',
                             'authToken', 'isLoggedIn', 'logTime', 'loginStatus',
-                            'status', 'Serve_status', 'notapprovedMOT', 'crd', 'upd', 'companyId'
+                            'status', 'Serve_status', 'notapprovedMOT', 'crd', 'upd', 'companyId','unactive','walletStatus'      ,'ledgerStatus'
                         ];
 }

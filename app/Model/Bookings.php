@@ -31,21 +31,9 @@ class Bookings extends Model
             return $bookings;
 		}
 
-		public static function getDriverBookings($driverUserId)
-		{
-			$bookings=DB::table('bookings')->where('driverId',$driverUserId)
-											->leftJoin('users', 'bookings.passengerId', '=', 'users.userId')
-           									->select('bookings.bookingId', 'bookings.passengerId', 'bookings.pickupAddress', 'bookings.destinationAddress', 'bookings.rideStartDate', 'bookings.rideStartTime', 'bookings.rideEndTime', 'bookings.actualDistance', 'bookings.rideStatus', 'bookings.Actual_TripTotal','bookings.driverId', 'users.userName', 'users.mobileNumber')->get();
-            return $bookings;
-		}
+		
 
-		public static function getPassengerBookings($UserId)
-		{
-			$bookings=DB::table('bookings')->where('passengerId',$UserId)
-											->leftJoin('driverdetail', 'bookings.driverId', '=', 'driverdetail.userId')
-           									->select('bookings.bookingId', 'bookings.passengerId', 'bookings.pickupAddress', 'bookings.destinationAddress', 'bookings.rideStartDate', 'bookings.rideStartTime', 'bookings.rideEndTime', 'bookings.actualDistance', 'bookings.rideStatus', 'bookings.Actual_TripTotal','bookings.driverId', 'driverdetail.fullName', 'driverdetail.mobileNumber')->get();
-            return $bookings;
-		}
+		
 
 		public static function getTodayBookings_count()
 		{
@@ -63,10 +51,9 @@ class Bookings extends Model
 			$endDate=date("Y-m-d",strtotime($Date)).' 23:59'; //23:59 end day time
 		
 			$bookings=Bookings::whereBetween('bookings.crd', [$startDate, $endDate])
-			->select('bookings.bookingId', 'bookings.passengerId', 'bookings.pickupAddress', 'bookings.destinationAddress', 'bookings.rideStartDate', 'bookings.rideStartTime', 'bookings.rideEndTime', 'bookings.actualDistance', 'bookings.rideStatus', 'bookings.driverId', 'users.userName', 'driverdetail.fullName','users.mobileNumber','bookings.crd')
-			->leftJoin('users', 'bookings.passengerId', '=', 'users.userId')
-           	->leftJoin('driverdetail', 'bookings.driverId', '=', 'driverdetail.userId')
-			->get();
+					->leftJoin('passengerdetail', 'bookings.passengerId', '=', 'passengerdetail.userId')
+			        ->leftJoin('driverdetail', 'bookings.driverId', '=', 'driverdetail.userId')
+			        ->select('bookings.bookingId', 'bookings.passengerId', 'bookings.pickupAddress','bookings.pickupLatLong','bookings.EndTripLatLng', 'bookings.destinationAddress', 'bookings.rideStartDate','bookings.tripTotal','bookings.rideStartTime', 'bookings.rideEndTime', 'bookings.actualDistance','bookings.distance' ,'bookings.rideStatus','bookings.rideEndDate' ,'bookings.Actual_TripTotal','bookings.driverId','passengerdetail.fullName as passengerName','passengerdetail.mobileNumber as passengerMobile')->get();
 			 return $bookings;
 
 		}
@@ -94,4 +81,6 @@ class Bookings extends Model
 			->get();
 			return $bookings;
 		}
+
+
 }

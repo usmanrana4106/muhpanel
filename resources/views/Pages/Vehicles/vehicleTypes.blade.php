@@ -27,7 +27,29 @@
             
         <div class="container-fluid">
           <div class="row">
+
+
+
+
+              @if(!empty($vehicleCreate))
+                  <div class="alert alert-success">
+                      Vehicle Type is Successfully Created!!!!
+                  </div>
+              @endif
+
+              @if(!empty($updateCarDetails))
+                  <div class="alert alert-success">
+                      Vehicle Type is Successfully Updated!!!!
+                  </div>
+              @endif
+
+
             <div class="col-md-12">
+                <div class="pull-right">
+                    <a href="{{ url('/R_car_createCarType') }}">
+                        <button  type="button" class="btn btn-success size">Create Vechicle Type</button>
+                    </a>
+                </div>
               <div class="card">
                 <div class="card-header card-header-primary card-header-icon">
                   <div class="card-icon">
@@ -40,7 +62,7 @@
                     <!--        Here you can write extra buttons/actions for the toolbar              -->
                   </div>
                   <div class="material-datatables">
-                    <table id="datatables" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
+                    <table id="datatables" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
                       <thead>
                         <tr>
                           
@@ -48,14 +70,14 @@
 		                <th>Id</th>
                         <th>Image</th>
                         <th>Name</th>
-                        <th>Counter Price (In $)</th>
-                        <th>Price/Km </th>
-                        <th>Price/Time </th>
-                        <th>Price/Km RH </th>
-                        <th>Price/Time RH</th>
-                        <th>Car seats</th>
+                        <th><small>Opening Counter Price (SAR)</small></th>
+                        <th><small>Distance Cost Rate (SARs / KM)</small></th>
+                        <th><small>Time Cost Rate (SARs / Min)</small></th>
+                        <th><small>Distance Cost in Rush Hours (SARs / KM)</small> </th>
+                        <th><small>Time Cost in Rush Hours (SARs / Min)</small></th>
+                        <th><small>Number of Seat</small></th>
                         <th>Status</th>
-                        <th class="text-right">Action</th>
+                        <th class="text-right"><small>Action Buttons</small></th>
                         
                     
                           
@@ -70,7 +92,7 @@
                                     
                                     <td > <i ><img src="{{url('public/uploads/images/carImage/',$vehicle->carImage)}}" style=" border-radius: 40px; background-color: #62A8EA; height: 60px; width: 70px;"></i></td>
 
-                                    <td >{{ $vehicle->carName }}</td>
+                                    <td >{{ $vehicle->carName }} <font style="size:10px" >({{ $vehicle->arabicName }})</font></td>
                                     <td >{{ $vehicle->Counterprice }}</td>
                                     <td >{{ $vehicle->priceByDistence }}</td>
                                     <td >{{ $vehicle->priceByTime }}</td>
@@ -79,36 +101,35 @@
                                     <td >{{ $vehicle->carSheet }}</td>
 
                                     @if($vehicle->status == 1)
-                                      <td ><span class="btn btn-icon btn-info btn-outline btn-success ">Active</span></td>
+
+                                      <td>
+                                         <a href="{{route('Vehicle.changeStatus',['id'=>$vehicle->carId,'status'=>$vehicle->status])}}">
+                                        <span class="btn btn-icon btn-info btn-outline btn-success ">Active</span>
+                                         </a>
+                                      </td>
                                     @else
-                                      <td ><span class="btn btn-icon btn-info btn-outline btn-danger">InActive</span></td>
+                                      <td >
+                                        <a href="{{route('Vehicle.changeStatus',['id'=>$vehicle->carId,'status'=>$vehicle->status])}}">
+                                        <span class="btn btn-icon btn-info btn-outline btn-danger">InActive</span>
+                                        </a>
+                                      </td>
                                     @endif
-                                    <td >
+                                    
                                      <td class="td-actions ">
-                                      @if($vehicle->status == 1)
-                                      <a href="{{route('Vehicle.changeStatus',['id'=>$vehicle->carId,'status'=>$vehicle->status])}}">
-                                          <button type="button" rel="tooltip" class="btn btn-danger">
-                                            <i class="material-icons">close</i>
-                                          </button>
-                                      </a>
-                                      @else
-                                      <a href="{{route('Vehicle.changeStatus',['id'=>$vehicle->carId,'status'=>$vehicle->status])}}">
-                                        <button type="button" rel="tooltip" class="btn btn-success">
-                                          <i class="material-icons">check</i>
-                                        </button>
-                                      </a>
-                                      @endif
+                                      
 
                                       <a href="{{route('Vehicle.editShow',$vehicle->carId)}}">
-                                      <button type="button" rel="tooltip" class="btn btn-warning">
+                                      <button type="button" rel="tooltip" class="btn btn-warning"> Edit
                                         <i class="material-icons">edit</i>
                                       </button>
                                       </a>
-                                      <button type="button" rel="tooltip" class="btn btn-primary>
+                                      <a href="{{route('Vehicle.delete',$vehicle->carId)}}">
+                                      <button type="button" rel="tooltip" class="btn btn-primary">
                                         <i class="material-icons">delete</i>
                                       </button>
+                                      </a>
                                     </td>
-                                  </td>
+                                 
                                    
                                 </tr>
 
@@ -178,7 +199,6 @@
 
 
 @include('layouts.js')
-
 <script>
     $(document).ready(function() {
       $('#datatables').DataTable({
@@ -216,6 +236,7 @@
       });
     });
   </script>
+
 
 
 

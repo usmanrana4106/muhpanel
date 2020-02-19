@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 use App\Model\Verion;
+use Validator;
 
 //*****Created By Usman Abbas*******//
 
@@ -13,16 +13,27 @@ class VersionController extends Controller
 {
     public function versionCheck(Request $request)
     {
-    	if($request->android==1)
+        $validation=Validator::make($request->all(), [
+            'version_code'=>'required',
+            'versionId'=>'required'
+        ]);
+        if($validation->fails())
+        {
+            $errors = $validation->errors();
+            $ErrorDetail=['ErrorDetails'=>"Error in Version Checking Parameters",'ErrorMessage'=> $errors->toJson()];
+            $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
+            return  response()->json(array('array'=>$array), 200);
+        }
+    	if($request->versionId==1)
     	{
-    		$version=Version::where('id',$request->android)->first();	
+    		$version=Verion::where('id',$request->versionId)->first();
     	}
-    	if ($request->ios==2)
+    	if ($request->versionId==2)
     	{
-    		$version=Version::where('id',$request->ios)->first();	
+    		$version=Verion::where('id',$request->versionId)->first();
     	}
 
-    	if ($version->version_code==$request->version_code) 
+    	if ($version->version_code == $request->version_code)
     	{
     		$ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>""];
 		    $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>1);
@@ -31,7 +42,7 @@ class VersionController extends Controller
     	else
     	{
     		$ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>""];
-			$array=array('ErrorDetail'=>$ErrorDetail,'Result'=>1);
+			$array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
 		    return  response()->json(array('array'=>$array), 200);
     	}
     }

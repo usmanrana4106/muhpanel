@@ -4,26 +4,39 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Database\QueryException;
 
 use Validator;
 use App\Model\Drivers;
 use App\Model\Users;
-use App\Model\Bookings;
 use App\Model\PassengerDetails;
 use App\Model\Notification;
 use App\Model\PassengerRating;
 use App\Model\PassengerWallet;
 
+use App\Model\Bookings\Bookings;
+use App\Model\Bookings\BookingDetails;
+use App\Model\Bookings\BookingBroadCasting;
+use App\Model\Bookings\BookingProgress;
+use App\Model\Bookings\BookingComplete;
+
 
 
 class PassengerController extends Controller
 {
+    protected $url;
+
+    public function __construct()
+    {
+        $this->url = URL::to('/');
+    }
     public function updateProfile(Request $request)
     {
-    	$validation=Validator::make($request->all(), [
-                                                            'userId' => 'required',
-                                                            'email' => 'required'
-                                                      ]);
+    	$validation=Validator::make($request->all(),[
+                                                        'userId' => 'required',
+                                                        'email' => 'required'
+                                                    ]);
         if($validation->fails())
         {
             $errors = $validation->errors();
@@ -31,8 +44,21 @@ class PassengerController extends Controller
             $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
             return  response()->json(array('array'=>$array), 200);
         }
+
+        $user=Users::where('email',$request->email)->first();
+        if (!empty($user))
+        {
+            if ($user->userId != $request->userId)
+            {
+                $ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>"Email is Already Existed"];
+                $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
+                return  response()->json(array('array'=>$array), 200);
+            }
+
+        }
         $input['email']=$request->email;
         $file=$request->file('profileImage');
+        $profileImage='';
         if($file)
         {
             $extension=$file->getClientOriginalExtension();
@@ -74,7 +100,6 @@ class PassengerController extends Controller
 		}
     }
 
-
     public function getWallet(Request $request)
     {
         $validation=Validator::make($request->all(), [
@@ -104,7 +129,6 @@ class PassengerController extends Controller
                                                 'due'=>0
                                              ]);
                     Users::where('userId',$request->userId)->update(['walletStatus'=>1]);
-
                 }
                 
                 $ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>""];
@@ -118,9 +142,6 @@ class PassengerController extends Controller
         }
     }
 
-
-
-   
     public function previousBookings(Request $request)
     {
         $validation=Validator::make($request->all(), [
@@ -133,7 +154,7 @@ class PassengerController extends Controller
             $array=array('ErrorDetail'=>$ErrorDetail,'Result'=>0);
             return  response()->json(array('array'=>$array), 200);
         }
-        $booking=Bookings::where(['passengerId'=>$request->userId,'rideStatus'=>'4'])->paginate(5);
+        $booking=BookingComplete::where(['passengerId'=>$request->userId,'rideStatus'=>'4'])->paginate(5);
         if (!empty($booking[0])) 
         {
             $ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>""];
@@ -148,7 +169,6 @@ class PassengerController extends Controller
         }
         
     }
-
 
     public function cancelBookings(Request $request)
     {
@@ -177,7 +197,6 @@ class PassengerController extends Controller
         }
     }
 
-
     public function updateProfileImage(Request $request)
     {
     	$validation=Validator::make($request->all(), [
@@ -200,7 +219,7 @@ class PassengerController extends Controller
 	        	$extension=$file->getClientOriginalExtension();
 	            $filename =$request->userId.".".$extension;
 	            $file->move('public/uploads/images/passengerImage/',$filename);
-	            Drivers::where('userId',$user->id)->update(['profileImage'=> $filename]);
+	            Users::where('userId',$user->userId)->update(['profileImage'=> $filename]);
 	            $user->profileImage=$this->url."/public/uploads/images/passengerImage/".$filename;
 
 	            $ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>""];
@@ -213,13 +232,12 @@ class PassengerController extends Controller
 	    return  response()->json(array('array'=>$array), 200);
     }
 
-    function passengerRating(Request $request)
+    public function passengerRating(Request $request)
     {
          $validation=Validator::make($request->all(), [
                                                             'driverId' => 'required',
                                                             'passengerId'=>'required',
                                                             'rate'=>'required',
-                                                            'review'=>'required',
                                                             'status'=>'required',
                                                             'bookingId'=>'required'
                                                       ]);
@@ -239,7 +257,6 @@ class PassengerController extends Controller
             $input['status']=1;
             $input['bookingId']=$request->bookingId;
             PassengerRating::create($input);
-            
             $rating=PassengerRating::where('passengerId',$request->passengerId)->avg('rate');
             PassengerDetails::where('userId',$request->userId)->update(['rating'=>$rating]);
             $ErrorDetail=['ErrorDetails'=>"",'ErrorMessage'=>""];

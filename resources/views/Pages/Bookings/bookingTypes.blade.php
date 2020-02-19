@@ -33,7 +33,7 @@
                       <i class="material-icons" >weekend</i>
                     </div>
                     <p class="card-category">New Bookings</p>
-                    <h3 class="card-title"></h3>
+                    <h3 class="card-title">{{ $BookingBroadCasting }}</h3>
                   </div>
                   <div class="card-footer">
                     <div class="stats">
@@ -54,7 +54,7 @@
                       <i class="material-icons">weekend</i>
                     </div>
                     <p class="card-category">Driver Reaching Customers</p>
-                    <h3 class="card-title"></h3>
+                    <h3 class="card-title">{{ $BookingReaching }}</h3>
                   </div>
                   <div class="card-footer">
                     <div class="stats">
@@ -73,7 +73,7 @@
                       <i class="material-icons">weekend</i>
                     </div>
                     <p class="card-category">Driver Arrived </p>
-                    <h3 class="card-title"></h3>
+                    <h3 class="card-title">{{ $BookingArrived }}</h3>
                   </div>
                   <div class="card-footer">
                     <div class="stats">
@@ -92,7 +92,7 @@
                       <i class="material-icons">weekend</i>
                     </div>
                     <p class="card-category">Start Trips </p>
-                    <h3 class="card-title"></h3>
+                    <h3 class="card-title">{{ $BookingStart }}</h3>
                   </div>
                   <div class="card-footer">
                     <div class="stats">
@@ -111,7 +111,7 @@
                       <i class="material-icons">weekend</i>
                     </div>
                     <p class="card-category">End Trips</p>
-                    <h3 class="card-title"></h3>
+                    <h3 class="card-title">{{ $BookingComplete }}</h3>
                   </div>
                   <div class="card-footer">
                     <div class="stats">
@@ -122,6 +122,26 @@
                   </div>
                 </div>
               </div>
+
+
+              {{--<div class="col-lg-3 col-md-6 col-sm-6">--}}
+                {{--<div class="card card-stats">--}}
+                  {{--<div class="card-header card-header-rose card-header-icon">--}}
+                    {{--<div class="card-icon">--}}
+                      {{--<i class="material-icons">weekend</i>--}}
+                    {{--</div>--}}
+                    {{--<p class="card-category">End Trips Today</p>--}}
+                    {{--<h3 class="card-title">today</h3>--}}
+                  {{--</div>--}}
+                  {{--<div class="card-footer">--}}
+                    {{--<div class="stats">--}}
+                      {{--<a href="{{route('Booking.Complete')}}" >--}}
+                        {{--<i class="material-icons">place</i> Get Details of Today End Trips--}}
+                      {{--</a>--}}
+                    {{--</div>--}}
+                  {{--</div>--}}
+                {{--</div>--}}
+              {{--</div>--}}
 
                
 
@@ -136,7 +156,7 @@
                       <i class="material-icons">weekend</i>
                     </div>
                     <p class="card-category">Cancel Booking</p>
-                    <h3 class="card-title"></h3>
+                    <h3 class="card-title">{{ $BookingCancelled }}</h3>
                   </div>
                   <div class="card-footer">
                     <div class="stats">
